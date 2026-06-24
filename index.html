@@ -1,0 +1,2257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SiDiagnosa - Hama & Penyakit Perkebunan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ===== CSS SAMA SEPERTI SEBELUMNYA ===== */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#f0f7f0; color:#1e3a2f; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:16px; }
+        #splashScreen { position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg,#1e4a3b,#2a6b52); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999; transition:opacity 0.6s ease, visibility 0.6s ease; color:#fff; padding:20px; text-align:center; }
+        #splashScreen .logo i { font-size:80px; color:#f6b83d; margin-bottom:16px; }
+        #splashScreen h1 { font-size:42px; font-weight:700; letter-spacing:2px; }
+        #splashScreen .sub { font-size:18px; opacity:0.8; margin-top:8px; max-width:400px; }
+        #splashScreen .btn-start { margin-top:40px; background:#f6b83d; border:none; padding:16px 48px; border-radius:50px; font-size:20px; font-weight:700; color:#1e4a3b; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s; box-shadow:0 8px 24px rgba(0,0,0,0.2); display:inline-flex; align-items:center; gap:12px; }
+        #splashScreen .btn-start:hover { transform:scale(1.05); box-shadow:0 12px 32px rgba(0,0,0,0.3); }
+        #splashScreen .btn-start:active { transform:scale(0.95); }
+        #splashScreen.fade-out { opacity:0; visibility:hidden; pointer-events:none; }
+        #splashScreen.hidden { display:none; }
+        #loginOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); display:none; justify-content:center; align-items:center; z-index:10000; }
+        #loginOverlay.show { display:flex; }
+        .login-modal { background:#fff; border-radius:32px; padding:40px 36px; max-width:420px; width:100%; box-shadow:0 30px 60px rgba(0,0,0,0.3); text-align:center; animation:slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform:translateY(30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+        .login-modal .logo { font-size:48px; color:#f6b83d; margin-bottom:8px; }
+        .login-modal h2 { font-size:24px; margin-bottom:6px; color:#1e4a3b; }
+        .login-modal p { color:#5f7d6f; margin-bottom:24px; font-size:14px; }
+        .login-modal .form-group { margin-bottom:16px; text-align:left; }
+        .login-modal .form-group label { font-weight:600; display:block; margin-bottom:4px; font-size:14px; color:#1e4a3b; }
+        .login-modal .form-group label i { color:#f6b83d; margin-right:6px; }
+        .login-modal .form-group input { width:100%; padding:12px 16px; border:2px solid #d5e8d5; border-radius:16px; font-size:15px; transition:0.2s; background:#fafffa; }
+        .login-modal .form-group input:focus { border-color:#2a6b52; outline:none; box-shadow:0 0 0 4px rgba(42,107,82,0.15); }
+        .login-modal .btn-login { width:100%; padding:14px; background:linear-gradient(135deg,#1e4a3b,#2a6b52); color:#fff; border:none; border-radius:50px; font-size:18px; font-weight:700; cursor:pointer; transition:0.25s; margin-top:8px; }
+        .login-modal .btn-login:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(30,74,59,0.3); }
+        .login-modal .btn-guest { background:transparent; border:none; color:#2a6b52; font-weight:600; margin-top:16px; cursor:pointer; font-size:15px; text-decoration:underline; transition:0.2s; }
+        .login-modal .btn-guest:hover { color:#1e4a3b; }
+        .login-modal .error-msg { color:#d9534f; font-size:14px; margin-top:8px; display:none; padding:8px 12px; background:#fde8e8; border-radius:10px; }
+        .login-modal .error-msg.show { display:block; }
+        .login-modal .info-guest { background:#eaf3ea; padding:12px 16px; border-radius:12px; margin-bottom:16px; font-size:13px; color:#2d5a47; }
+        .login-modal .info-guest i { color:#f6b83d; margin-right:6px; }
+        .app-container { max-width:900px; width:100%; background:#fff; border-radius:32px; box-shadow:0 20px 60px rgba(30,58,47,0.20); overflow:hidden; display:flex; flex-direction:column; }
+        .app-header { background:linear-gradient(135deg,#1e4a3b,#2a6b52); padding:24px 28px 18px 28px; color:#fff; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; border-bottom:4px solid #f6b83d; }
+        .app-header .logo { display:flex; align-items:center; gap:12px; }
+        .app-header .logo i { font-size:32px; color:#f6b83d; }
+        .app-header .logo h1 { font-size:24px; font-weight:700; letter-spacing:0.5px; }
+        .app-header .logo span { font-weight:300; font-size:14px; opacity:0.9; display:block; margin-top:2px; }
+        .header-right { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+        .header-date { font-size:14px; background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:30px; backdrop-filter:blur(4px); }
+        .user-info { display:flex; align-items:center; gap:10px; font-size:14px; background:rgba(255,255,255,0.10); padding:4px 12px 4px 16px; border-radius:30px; }
+        .user-info i { color:#f6b83d; }
+        .user-info .username { font-weight:600; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .btn-logout { background:rgba(255,255,255,0.2); border:none; color:#fff; padding:4px 14px; border-radius:30px; font-weight:600; cursor:pointer; font-size:13px; transition:0.2s; }
+        .btn-logout:hover { background:rgba(255,255,255,0.3); }
+        .btn-login-header { background:#f6b83d; border:none; color:#1e4a3b; padding:6px 18px; border-radius:30px; font-weight:700; cursor:pointer; font-size:14px; transition:0.2s; }
+        .btn-login-header:hover { transform:scale(1.05); }
+        .lang-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:4px 12px; border-radius:30px; font-weight:600; cursor:pointer; font-size:13px; transition:0.2s; display:flex; align-items:center; gap:6px; }
+        .lang-toggle:hover { background:rgba(255,255,255,0.25); }
+        .nav-buttons-header { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .btn-nav-header { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:#fff; padding:4px 14px; border-radius:30px; font-weight:600; font-size:13px; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; gap:6px; }
+        .btn-nav-header:hover { background:rgba(255,255,255,0.3); }
+        .btn-nav-header.danger { border-color:#f8a5a5; color:#f8a5a5; }
+        .btn-nav-header.danger:hover { background:rgba(248,165,165,0.25); }
+        .btn-nav-header.success { border-color:#6bcf8a; color:#6bcf8a; }
+        .btn-nav-header.success:hover { background:rgba(107,207,138,0.25); }
+        .btn-back-tab { background:#f6b83d; border:none; color:#1e4a3b; padding:6px 16px; border-radius:30px; font-weight:700; font-size:14px; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; gap:6px; margin-bottom:16px; }
+        .btn-back-tab:hover { transform:scale(1.05); background:#f5c84d; }
+        .btn-back-tab i { font-size:14px; }
+        .nav-tabs { display:flex; background:#eaf3ea; border-bottom:1px solid #cde0cd; padding:0 8px; gap:4px; flex-wrap:wrap; }
+        .nav-tabs button { flex:1; min-width:100px; padding:16px 12px 14px; border:none; background:transparent; font-size:15px; font-weight:600; color:#2d5a47; cursor:pointer; border-bottom:4px solid transparent; transition:0.2s; display:flex; align-items:center; justify-content:center; gap:8px; border-radius:12px 12px 0 0; }
+        .nav-tabs button i { font-size:18px; }
+        .nav-tabs button:hover { background:#d9ead9; }
+        .nav-tabs button.active { background:#fff; border-bottom-color:#f6b83d; color:#1e4a3b; }
+        .content { padding:28px 28px 32px; background:#fff; min-height:480px; }
+        .tab-panel { display:none; animation:fadeUp 0.3s ease; }
+        .tab-panel.active { display:block; }
+        @keyframes fadeUp { 0% { opacity:0; transform:translateY(10px); } 100% { opacity:1; transform:translateY(0); } }
+        .diagnosa-form { display:flex; flex-direction:column; gap:20px; }
+        .form-group { display:flex; flex-direction:column; gap:6px; }
+        .form-group label { font-weight:600; font-size:15px; color:#1e3a2f; display:flex; align-items:center; gap:8px; }
+        .form-group label i { color:#f6b83d; width:20px; }
+        .form-group select, .form-group textarea { padding:14px 16px; border:2px solid #d5e8d5; border-radius:16px; font-size:15px; font-family:inherit; background:#fafffa; transition:0.2s; resize:vertical; min-height:48px; }
+        .form-group select:focus, .form-group textarea:focus { border-color:#2a6b52; outline:none; box-shadow:0 0 0 4px rgba(42,107,82,0.15); }
+        .form-group textarea { min-height:110px; line-height:1.6; }
+        .form-group .hint { font-size:13px; color:#5f7d6f; margin-top:4px; }
+        .btn-diagnosa { background:linear-gradient(135deg,#1e4a3b,#2a6b52); color:#fff; border:none; padding:16px 28px; border-radius:50px; font-size:18px; font-weight:700; cursor:pointer; transition:0.25s; display:flex; align-items:center; justify-content:center; gap:12px; margin-top:8px; box-shadow:0 6px 20px rgba(30,74,59,0.30); }
+        .btn-diagnosa:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(30,74,59,0.40); }
+        .btn-diagnosa:active { transform:scale(0.97); }
+        .btn-diagnosa i { font-size:20px; }
+        .btn-diagnosa:disabled { opacity:0.5; cursor:not-allowed; transform:none !important; }
+        .hasil-diagnosa { margin-top:28px; padding:24px; border-radius:20px; background:#f6fbf6; border-left:6px solid #2a6b52; display:none; }
+        .hasil-diagnosa.show { display:block; }
+        .hasil-diagnosa .judul-hasil { font-size:20px; font-weight:700; color:#1e4a3b; margin-bottom:6px; display:flex; align-items:center; gap:10px; }
+        .hasil-diagnosa .judul-hasil i { color:#f6b83d; }
+        .hasil-diagnosa .sub-hasil { color:#3d6b56; font-size:14px; margin-bottom:16px; border-bottom:1px dashed #cde0cd; padding-bottom:12px; }
+        .hasil-item { background:#fff; border-radius:16px; padding:18px 20px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04); border:1px solid #e3f0e3; }
+        .hasil-item .nama-penyakit { font-weight:700; font-size:17px; color:#1e4a3b; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+        .hasil-item .nama-penyakit i { color:#d9534f; margin-right:4px; }
+        .hasil-item .skor { background:#f6b83d; color:#1e4a3b; padding:2px 12px; border-radius:30px; font-size:13px; font-weight:700; }
+        .hasil-item .detail { margin-top:8px; font-size:14px; line-height:1.7; color:#2d4d3d; }
+        .hasil-item .detail strong { color:#1e4a3b; }
+        .hasil-item .label-badge { display:inline-block; padding:2px 12px; border-radius:30px; font-size:12px; font-weight:600; margin-right:6px; }
+        .label-badge.penyakit { background:#fde8e8; color:#b33c3c; }
+        .label-badge.hama { background:#fff3e0; color:#b86b1f; }
+        .label-badge.defisiensi { background:#e3f0e3; color:#1e6b3a; }
+        .hasil-item .konsekuensi { margin-top:12px; padding:12px 16px; background:#fef6e6; border-radius:12px; border-left:4px solid #f6b83d; font-size:14px; }
+        .hasil-item .konsekuensi i { color:#e89c2e; margin-right:8px; }
+        .no-match { padding:24px; text-align:center; background:#fef9f0; border-radius:16px; border:2px dashed #d5e8d5; }
+        .no-match i { font-size:40px; color:#f6b83d; margin-bottom:12px; display:block; }
+        .no-match h3 { color:#1e4a3b; margin-bottom:6px; }
+        .no-match p { color:#5f7d6f; font-size:14px; }
+        .action-buttons { display:flex; flex-wrap:wrap; gap:12px; margin-top:20px; justify-content:center; }
+        .action-buttons .btn-action { padding:10px 24px; border:none; border-radius:50px; font-weight:700; font-size:15px; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+        .action-buttons .btn-action:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.15); }
+        .action-buttons .btn-share { background:#25D366; color:#fff; }
+        .action-buttons .btn-share:hover { background:#1da855; }
+        .action-buttons .btn-print { background:#2a6b52; color:#fff; }
+        .action-buttons .btn-print:hover { background:#1e4a3b; }
+        .action-buttons .btn-copy { background:#e8e8e8; color:#333; }
+        .action-buttons .btn-copy:hover { background:#d5d5d5; }
+        .calendar-wrapper { display:flex; flex-direction:column; gap:16px; }
+        .calendar-header { display:flex; justify-content:space-between; align-items:center; background:#eaf3ea; padding:12px 20px; border-radius:20px; flex-wrap:wrap; gap:8px; }
+        .calendar-header .month-year { font-size:20px; font-weight:700; color:#1e4a3b; }
+        .calendar-header .nav-btn { background:#fff; border:none; width:40px; height:40px; border-radius:50%; font-size:18px; cursor:pointer; transition:0.2s; box-shadow:0 2px 6px rgba(0,0,0,0.06); color:#1e4a3b; }
+        .calendar-header .nav-btn:hover { background:#f6b83d; color:#fff; }
+        .calendar-header .calendar-actions { display:flex; gap:8px; }
+        .calendar-header .calendar-actions button { padding:6px 16px; border:none; border-radius:30px; font-weight:600; font-size:13px; cursor:pointer; transition:0.2s; background:#fff; color:#1e4a3b; box-shadow:0 2px 6px rgba(0,0,0,0.06); }
+        .calendar-header .calendar-actions button:hover { background:#f6b83d; color:#fff; }
+        .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; background:#f6fbf6; border-radius:16px; padding:8px; }
+        .calendar-grid .day-name { text-align:center; font-weight:700; font-size:13px; color:#3d6b56; padding:8px 0; text-transform:uppercase; letter-spacing:0.5px; }
+        .calendar-grid .day-cell { aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:14px; font-size:16px; font-weight:600; color:#1e3a2f; background:#fff; cursor:pointer; transition:0.15s; position:relative; border:2px solid transparent; min-height:52px; }
+        .calendar-grid .day-cell:hover { background:#eaf3ea; }
+        .calendar-grid .day-cell.other-month { color:#b0cbb0; }
+        .calendar-grid .day-cell.today { border-color:#f6b83d; background:#fffbf0; }
+        .calendar-grid .day-cell.has-diagnosa { background:#d4e8d4; font-weight:700; }
+        .calendar-grid .day-cell.has-diagnosa::after { content:''; position:absolute; bottom:4px; width:8px; height:8px; background:#2a6b52; border-radius:50%; }
+        .calendar-grid .day-cell .day-number { font-size:17px; font-weight:700; }
+        .calendar-grid .day-cell .day-dot { font-size:10px; color:#2a6b52; }
+        .calendar-detail { background:#f6fbf6; border-radius:16px; padding:20px 24px; margin-top:8px; min-height:70px; border:1px solid #ddecdd; }
+        .calendar-detail .empty { color:#7a9a7a; text-align:center; padding:16px 0; font-size:14px; }
+        .calendar-detail .detail-item { padding:10px 0; border-bottom:1px solid #e3f0e3; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+        .calendar-detail .detail-item:last-child { border-bottom:none; }
+        .calendar-detail .detail-item .disease-name { font-weight:600; color:#1e4a3b; }
+        .calendar-detail .detail-item .comm-name { font-size:13px; background:#ddecdd; padding:2px 12px; border-radius:30px; color:#1e4a3b; }
+        .calendar-detail .detail-item .del-btn { background:none; border:none; color:#b33c3c; cursor:pointer; font-size:16px; opacity:0.6; transition:0.2s; }
+        .calendar-detail .detail-item .del-btn:hover { opacity:1; }
+        .reminder-list { display:flex; flex-direction:column; gap:16px; }
+        .reminder-card { background:#f6fbf6; border-radius:16px; padding:20px 24px; border-left:6px solid #f6b83d; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; transition:0.2s; }
+        .reminder-card:hover { background:#eef7ee; }
+        .reminder-card .reminder-info { display:flex; flex-direction:column; gap:4px; }
+        .reminder-card .reminder-info .r-title { font-weight:700; font-size:17px; color:#1e4a3b; }
+        .reminder-card .reminder-info .r-desc { font-size:14px; color:#2d5a47; }
+        .reminder-card .reminder-info .r-conseq { font-size:13px; color:#8a6d3b; background:#fef6e6; padding:4px 14px; border-radius:30px; display:inline-block; margin-top:4px; }
+        .reminder-card .reminder-actions { display:flex; gap:10px; align-items:center; }
+        .reminder-card .reminder-actions button { padding:8px 18px; border:none; border-radius:30px; font-weight:600; font-size:13px; cursor:pointer; transition:0.2s; }
+        .btn-done { background:#2a6b52; color:#fff; }
+        .btn-done:hover { background:#1e4a3b; }
+        .btn-dismiss { background:#e8e8e8; color:#555; }
+        .btn-dismiss:hover { background:#d5d5d5; }
+        .reminder-empty { text-align:center; padding:48px 24px; color:#7a9a7a; }
+        .reminder-empty i { font-size:48px; color:#cde0cd; margin-bottom:16px; display:block; }
+        .reminder-empty h3 { color:#1e4a3b; margin-bottom:6px; }
+        .guest-badge { background:#f6b83d; color:#1e4a3b; padding:2px 12px; border-radius:30px; font-size:12px; font-weight:700; margin-left:8px; }
+        @media (max-width:640px) {
+            .app-header { padding:18px 18px 14px; }
+            .app-header .logo h1 { font-size:20px; }
+            .app-header .logo i { font-size:26px; }
+            .nav-tabs button { font-size:13px; padding:12px 8px; min-width:70px; }
+            .nav-tabs button i { font-size:15px; }
+            .content { padding:18px 16px 24px; }
+            .calendar-grid .day-cell { font-size:14px; min-height:42px; }
+            .calendar-grid .day-cell .day-number { font-size:15px; }
+            .hasil-item { padding:14px 16px; }
+            .reminder-card { flex-direction:column; align-items:flex-start; }
+            .reminder-card .reminder-actions { width:100%; justify-content:flex-start; }
+            .btn-diagnosa { font-size:16px; padding:14px 20px; }
+            #splashScreen h1 { font-size:32px; }
+            #splashScreen .logo i { font-size:60px; }
+            #splashScreen .btn-start { padding:14px 32px; font-size:18px; }
+            .login-modal { padding:28px 20px; margin:16px; }
+            .header-right { width:100%; justify-content:flex-end; }
+            .user-info { font-size:13px; padding:2px 10px 2px 12px; }
+            .action-buttons .btn-action { padding:8px 16px; font-size:13px; }
+            .calendar-header { flex-direction:column; align-items:stretch; gap:8px; }
+            .calendar-header .calendar-actions { justify-content:center; }
+            .nav-buttons-header { width:100%; justify-content:flex-end; }
+        }
+        @media (max-width:420px) {
+            .app-header .logo span { font-size:12px; }
+            .nav-tabs button { font-size:11px; padding:10px 4px; min-width:50px; gap:4px; }
+            .nav-tabs button i { font-size:13px; }
+            .calendar-grid { gap:2px; padding:4px; }
+            .calendar-grid .day-cell { min-height:34px; border-radius:10px; font-size:12px; }
+            .calendar-grid .day-cell .day-number { font-size:13px; }
+            .calendar-header .month-year { font-size:16px; }
+            #splashScreen h1 { font-size:26px; }
+            #splashScreen .logo i { font-size:48px; }
+            #splashScreen .btn-start { padding:12px 24px; font-size:16px; }
+        }
+        @media print {
+            body { background:#fff; padding:0; margin:0; }
+            .app-container { max-width:100%; border-radius:0; box-shadow:none; padding:20px; }
+            .app-header, .nav-tabs, .action-buttons, .btn-diagnosa, .btn-login-header, .btn-logout, .header-right .user-info, .header-date, .calendar-header .nav-btn, .calendar-header .calendar-actions, .del-btn, .reminder-actions, .btn-done, .btn-dismiss, .btn-back-tab, .nav-buttons-header, .lang-toggle { display:none !important; }
+            .tab-panel { display:block !important; }
+            .tab-panel:not(.active) { display:none !important; }
+            #tabDiagnosa .diagnosa-form { display:none !important; }
+            .hasil-diagnosa { display:block !important; border-left-color:#2a6b52; margin-top:0; }
+            .hasil-item { break-inside:avoid; border:1px solid #ccc; box-shadow:none; }
+            .calendar-grid .day-cell { border:1px solid #ccc; background:#fff !important; }
+            .calendar-grid .day-cell.has-diagnosa { background:#d4e8d4 !important; }
+            .calendar-detail { border:1px solid #ccc; }
+            .no-match { border:1px solid #ccc; }
+            .reminder-card { break-inside:avoid; border:1px solid #ccc; }
+            .reminder-empty { border:1px solid #ccc; }
+            .login-modal { display:none !important; }
+            #loginOverlay { display:none !important; }
+            #splashScreen { display:none !important; }
+        }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:#eaf3ea; border-radius:10px; }
+        ::-webkit-scrollbar-thumb { background:#2a6b52; border-radius:10px; }
+        .text-muted { color:#5f7d6f; }
+        .mt-8 { margin-top:8px; }
+        .mb-8 { margin-bottom:8px; }
+        .flex-between { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+        .badge { display:inline-block; padding:2px 12px; border-radius:30px; font-size:12px; font-weight:600; }
+        .badge-success { background:#d4e8d4; color:#1e6b3a; }
+        .badge-warning { background:#fef6e6; color:#8a6d3b; }
+        .badge-danger { background:#fde8e8; color:#b33c3c; }
+        .sumber { font-size:12px; color:#5f7d6f; margin-top:6px; border-top:1px dashed #d5e8d5; padding-top:6px; }
+        .sumber i { margin-right:4px; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SPLASH SCREEN ===== -->
+    <div id="splashScreen">
+        <div class="logo"><i class="fas fa-seedling"></i></div>
+        <h1 data-i18n="splash_title">SiDiagnosa</h1>
+        <p class="sub" data-i18n="splash_sub">Identifikasi hama, penyakit, dan defisiensi hara pada tanaman perkebunan Anda</p>
+        <button class="btn-start" id="btnStartSplash"><i class="fas fa-play"></i> <span data-i18n="splash_start">Mulai Aplikasi</span></button>
+    </div>
+
+    <!-- ===== LOGIN MODAL ===== -->
+    <div id="loginOverlay">
+        <div class="login-modal">
+            <div class="logo"><i class="fas fa-envelope"></i></div>
+            <h2 data-i18n="login_title">Login dengan Email</h2>
+            <p data-i18n="login_sub">Gunakan email Anda untuk menyimpan riwayat diagnosa secara pribadi.</p>
+            <div class="info-guest">
+                <i class="fas fa-info-circle"></i> 
+                <span data-i18n="guest_info">Mode Tamu: Data diagnosa tidak akan tersimpan.</span>
+            </div>
+            <div class="form-group">
+                <label data-i18n="login_email_label"><i class="fas fa-at"></i> Alamat Email</label>
+                <input type="email" id="loginEmail" data-i18n-placeholder="login_email_ph" placeholder="contoh: email@gmail.com" />
+            </div>
+            <div class="error-msg" id="loginError" data-i18n="login_error">Email tidak valid. Masukkan alamat email yang benar.</div>
+            <button class="btn-login" id="btnLogin"><i class="fas fa-sign-in-alt"></i> <span data-i18n="login_btn">Login dengan Email</span></button>
+            <button class="btn-guest" id="btnGuest"><i class="fas fa-user-secret"></i> <span data-i18n="login_guest">Lanjut sebagai Tamu (Data Tidak Tersimpan)</span></button>
+        </div>
+    </div>
+
+    <!-- ===== APP CONTAINER ===== -->
+    <div class="app-container" id="app" style="display:none;">
+        <header class="app-header">
+            <div class="logo">
+                <i class="fas fa-seedling"></i>
+                <div><h1 data-i18n="app_title">SiDiagnosa</h1><span data-i18n="app_subtitle">Hama · Penyakit · Defisiensi</span></div>
+            </div>
+            <div class="header-right">
+                <div class="header-date"><i class="far fa-calendar-alt"></i> <span id="currentDateDisplay"></span></div>
+                <div class="user-info" id="userInfo" style="display:none;">
+                    <i class="fas fa-user"></i>
+                    <span class="username" id="displayUsername">guest</span>
+                    <span class="guest-badge" id="userBadge" style="display:none;">Tamu</span>
+                    <button class="btn-logout" id="btnLogout"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout_btn">Logout</span></button>
+                </div>
+                <button class="btn-login-header" id="btnLoginHeader" style="display:none;"><i class="fas fa-sign-in-alt"></i> <span data-i18n="login_header_btn">Login</span></button>
+                <div class="nav-buttons-header">
+                    <button class="btn-nav-header success" id="btnBackToSplash"><i class="fas fa-home"></i> <span data-i18n="back_to_start">Kembali ke Awal</span></button>
+                    <button class="btn-nav-header danger" id="btnExitApp"><i class="fas fa-times"></i> <span data-i18n="exit_app">Keluar</span></button>
+                    <button class="lang-toggle" id="langToggle"><i class="fas fa-globe"></i> <span id="langToggleLabel">ID</span></button>
+                </div>
+            </div>
+        </header>
+        <nav class="nav-tabs" id="navTabs">
+            <button class="active" data-tab="tabDiagnosa"><i class="fas fa-stethoscope"></i> <span data-i18n="tab_diagnosa">Diagnosa</span></button>
+            <button data-tab="tabKalender"><i class="fas fa-calendar-alt"></i> <span data-i18n="tab_kalender">Kalender</span></button>
+            <button data-tab="tabPengingat"><i class="fas fa-bell"></i> <span data-i18n="tab_pengingat">Pengingat</span></button>
+        </nav>
+        <div class="content">
+            <!-- TAB 1 -->
+            <div class="tab-panel active" id="tabDiagnosa">
+                <div class="diagnosa-form">
+                    <div class="form-group">
+                        <label><i class="fas fa-tree"></i> <span data-i18n="diagnosa_commodity_label">Pilih Komoditi</span></label>
+                        <select id="commoditySelect">
+                            <option value="" data-i18n="diagnosa_commodity_ph">-- Pilih Komoditi --</option>
+                            <option value="sawit">🌴 Kelapa Sawit</option>
+                            <option value="kakao">🍫 Kakao</option>
+                            <option value="kopi">☕ Kopi</option>
+                            <option value="karet">🌳 Karet</option>
+                            <option value="tebu">🌾 Tebu</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-comment-medical"></i> <span data-i18n="diagnosa_symptom_label">Keluhan / Gejala Tanaman</span></label>
+                        <textarea id="symptomInput" data-i18n-placeholder="diagnosa_symptom_ph" placeholder="Contoh: daun menguning, batang berlubang, buah busuk, bercak coklat, layu, dll."></textarea>
+                        <div class="hint"><i class="fas fa-info-circle"></i> <span data-i18n="diagnosa_symptom_hint">Jelaskan gejala yang terlihat pada tanaman Anda secara detail.</span></div>
+                    </div>
+                    <button class="btn-diagnosa" id="btnDiagnosa"><i class="fas fa-search-plus"></i> <span data-i18n="diagnosa_btn">Diagnosa Sekarang</span></button>
+                    <div id="saveStatus" style="font-size:13px;color:#5f7d6f;text-align:center;display:none;margin-top:4px;">
+                        <i class="fas fa-info-circle"></i> <span id="saveStatusText"></span>
+                    </div>
+                </div>
+                <div class="hasil-diagnosa" id="hasilDiagnosa">
+                    <div class="judul-hasil"><i class="fas fa-clipboard-list"></i> <span data-i18n="result_title">Hasil Diagnosa</span></div>
+                    <div class="sub-hasil" id="hasilSub">Berdasarkan gejala yang Anda sampaikan:</div>
+                    <div id="hasilContainer"></div>
+                    <div class="action-buttons" id="actionButtons" style="display:none;">
+                        <button class="btn-action btn-share" id="btnShareResult"><i class="fas fa-share-alt"></i> <span data-i18n="share_btn">Bagikan</span></button>
+                        <button class="btn-action btn-print" id="btnPrintResult"><i class="fas fa-print"></i> <span data-i18n="print_btn">Cetak / PDF</span></button>
+                        <button class="btn-action btn-copy" id="btnCopyResult"><i class="fas fa-copy"></i> <span data-i18n="copy_btn">Salin Teks</span></button>
+                    </div>
+                </div>
+            </div>
+            <!-- TAB 2 -->
+            <div class="tab-panel" id="tabKalender">
+                <button class="btn-back-tab" id="btnBackFromCalendar"><i class="fas fa-arrow-left"></i> <span data-i18n="back_to_diagnosa">Kembali ke Diagnosa</span></button>
+                <div class="calendar-wrapper">
+                    <div class="calendar-header">
+                        <button class="nav-btn" id="calPrev"><i class="fas fa-chevron-left"></i></button>
+                        <span class="month-year" id="calMonthYear">Januari 2026</span>
+                        <button class="nav-btn" id="calNext"><i class="fas fa-chevron-right"></i></button>
+                        <div class="calendar-actions">
+                            <button id="btnPrintCalendar"><i class="fas fa-print"></i> <span data-i18n="print_calendar_btn">Cetak Riwayat</span></button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                    <div class="calendar-detail" id="calendarDetail">
+                        <div class="empty"><i class="fas fa-calendar-day"></i> <span data-i18n="calendar_detail_empty">Klik tanggal untuk melihat riwayat diagnosa.</span></div>
+                    </div>
+                </div>
+            </div>
+            <!-- TAB 3 -->
+            <div class="tab-panel" id="tabPengingat">
+                <button class="btn-back-tab" id="btnBackFromReminder"><i class="fas fa-arrow-left"></i> <span data-i18n="back_to_diagnosa">Kembali ke Diagnosa</span></button>
+                <div id="reminderContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  TRANSLATIONS (DITAMBAHKAN terjemahan untuk tombol kembali ke awal)
+        // ================================================================
+        const translations = {
+            id: {
+                splash_title: 'SiDiagnosa',
+                splash_sub: 'Identifikasi hama, penyakit, dan defisiensi hara pada tanaman perkebunan Anda',
+                splash_start: 'Mulai Aplikasi',
+                login_title: 'Login dengan Email',
+                login_sub: 'Gunakan email Anda untuk menyimpan riwayat diagnosa secara pribadi.',
+                login_email_label: 'Alamat Email',
+                login_email_ph: 'contoh: email@gmail.com',
+                login_error: 'Email tidak valid. Masukkan alamat email yang benar.',
+                login_btn: 'Login dengan Email',
+                login_guest: 'Lanjut sebagai Tamu (Data Tidak Tersimpan)',
+                guest_info: 'Mode Tamu: Data diagnosa tidak akan tersimpan.',
+                login_header_btn: 'Login',
+                logout_btn: 'Logout',
+                app_title: 'SiDiagnosa',
+                app_subtitle: 'Hama · Penyakit · Defisiensi',
+                tab_diagnosa: 'Diagnosa',
+                tab_kalender: 'Kalender',
+                tab_pengingat: 'Pengingat',
+                diagnosa_commodity_label: 'Pilih Komoditi',
+                diagnosa_commodity_ph: '-- Pilih Komoditi --',
+                diagnosa_symptom_label: 'Keluhan / Gejala Tanaman',
+                diagnosa_symptom_ph: 'Contoh: daun menguning, batang berlubang, buah busuk, bercak coklat, layu, dll.',
+                diagnosa_symptom_hint: 'Jelaskan gejala yang terlihat pada tanaman Anda secara detail.',
+                diagnosa_btn: 'Diagnosa Sekarang',
+                result_title: 'Hasil Diagnosa',
+                result_sub_prefix: 'Berdasarkan gejala yang Anda sampaikan:',
+                result_no_match_title: 'Belum ada diagnosis yang cocok',
+                result_no_match_desc: 'Gejala yang Anda sampaikan belum teridentifikasi. Coba deskripsikan lebih detail atau konsultasikan dengan ahli perkebunan setempat.',
+                result_no_match_tip: 'Tips: sebutkan bagian tanaman, warna, tekstur, dan perubahan yang terlihat.',
+                result_found_prefix: 'Ditemukan {count} diagnosis untuk {commodity} (diurutkan berdasarkan tingkat kecocokan):',
+                share_btn: 'Bagikan',
+                print_btn: 'Cetak / PDF',
+                copy_btn: 'Salin Teks',
+                print_calendar_btn: 'Cetak Riwayat',
+                calendar_detail_empty: 'Klik tanggal untuk melihat riwayat diagnosa.',
+                calendar_detail_no_diagnosa: 'Tidak ada diagnosa pada tanggal {date}.',
+                calendar_detail_title: 'Riwayat Diagnosa — {date}',
+                reminder_empty_title: 'Semua pengingat sudah selesai',
+                reminder_empty_desc: 'Tidak ada pengingat aktif saat ini. Terus pantau kesehatan tanaman Anda!',
+                reminder_active_prefix: '{count} pengingat aktif',
+                reminder_btn_done: 'Selesai',
+                reminder_btn_dismiss: 'Abaikan',
+                disease_type_penyakit: 'Penyakit',
+                disease_type_hama: 'Hama',
+                disease_type_defisiensi: 'Defisiensi Hara',
+                commodity_sawit: 'Kelapa Sawit',
+                commodity_kakao: 'Kakao',
+                commodity_kopi: 'Kopi',
+                commodity_karet: 'Karet',
+                commodity_tebu: 'Tebu',
+                share_shared_text: '🌱 HASIL DIAGNOSA SiDiagnosa\nKomoditi: {commodity}\nGejala: {symptoms}\n\n',
+                share_entry: '🔹 {disease} ({score}% cocok)\n   {description}\n   Penanganan: {treatment}\n   Konsekuensi: {consequence}\n\n',
+                share_date: '📅 {date}',
+                login_error_blank: 'Email tidak boleh kosong.',
+                login_error_invalid: 'Masukkan alamat email yang valid (contoh: nama@gmail.com).',
+                confirm_logout: 'Yakin ingin logout? Riwayat akan tetap tersimpan di akun Anda.',
+                confirm_delete: 'Hapus riwayat diagnosa ini?',
+                confirm_dismiss: 'Hapus pengingat ini?',
+                alert_no_commodity: 'Pilih komoditi terlebih dahulu.',
+                alert_no_symptom: 'Silakan tuliskan keluhan / gejala tanaman Anda.',
+                copy_success: 'Hasil diagnosa telah disalin ke clipboard!',
+                share_fallback: 'Hasil diagnosa telah disalin ke clipboard! Anda bisa membagikannya ke aplikasi lain.',
+                type_badge_penyakit: 'Penyakit',
+                type_badge_hama: 'Hama',
+                type_badge_defisiensi: 'Defisiensi Hara',
+                day_names: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+                reminder_on_date: 'Diagnosa pada {date}',
+                if_not_treated: 'Jika tidak ditangani: {consequence}',
+                sumber: 'Sumber',
+                back_to_start: 'Kembali ke Awal',
+                exit_app: 'Keluar',
+                back_to_diagnosa: 'Kembali ke Diagnosa',
+                confirm_exit: 'Yakin ingin keluar dari aplikasi?',
+                login_success: 'Selamat datang, {email}!',
+                guest_mode: 'Mode Tamu',
+                data_saved: '✓ Data tersimpan di akun {email}',
+                data_not_saved: '⚠ Mode Tamu: Data tidak akan tersimpan',
+                no_save_guest: '⚠ Mode Tamu - Diagnosa tidak tersimpan di riwayat',
+                confirm_back_to_start: 'Kembali ke halaman awal? Data saat ini akan direset.'
+            },
+            en: {
+                splash_title: 'SiDiagnosa',
+                splash_sub: 'Identify pests, diseases, and nutrient deficiencies in your plantation crops',
+                splash_start: 'Start App',
+                login_title: 'Login with Email',
+                login_sub: 'Use your email to save your diagnosis history privately.',
+                login_email_label: 'Email Address',
+                login_email_ph: 'example: email@gmail.com',
+                login_error: 'Invalid email. Please enter a valid email address.',
+                login_btn: 'Login with Email',
+                login_guest: 'Continue as Guest (Data Not Saved)',
+                guest_info: 'Guest Mode: Diagnosis data will not be saved.',
+                login_header_btn: 'Login',
+                logout_btn: 'Logout',
+                app_title: 'SiDiagnosa',
+                app_subtitle: 'Pests · Diseases · Deficiencies',
+                tab_diagnosa: 'Diagnosis',
+                tab_kalender: 'Calendar',
+                tab_pengingat: 'Reminders',
+                diagnosa_commodity_label: 'Select Commodity',
+                diagnosa_commodity_ph: '-- Select Commodity --',
+                diagnosa_symptom_label: 'Complaint / Plant Symptoms',
+                diagnosa_symptom_ph: 'Example: yellowing leaves, holes in stem, rotten fruit, brown spots, wilting, etc.',
+                diagnosa_symptom_hint: 'Describe the symptoms you see on your plant in detail.',
+                diagnosa_btn: 'Diagnose Now',
+                result_title: 'Diagnosis Result',
+                result_sub_prefix: 'Based on the symptoms you provided:',
+                result_no_match_title: 'No matching diagnosis found',
+                result_no_match_desc: 'The symptoms you provided could not be identified. Try describing in more detail or consult with a local plantation expert.',
+                result_no_match_tip: 'Tip: mention the plant part, color, texture, and changes observed.',
+                result_found_prefix: 'Found {count} diagnosis for {commodity} (sorted by match level):',
+                share_btn: 'Share',
+                print_btn: 'Print / PDF',
+                copy_btn: 'Copy Text',
+                print_calendar_btn: 'Print History',
+                calendar_detail_empty: 'Click a date to view diagnosis history.',
+                calendar_detail_no_diagnosa: 'No diagnosis on {date}.',
+                calendar_detail_title: 'Diagnosis History — {date}',
+                reminder_empty_title: 'All reminders done',
+                reminder_empty_desc: 'No active reminders. Keep monitoring your plant health!',
+                reminder_active_prefix: '{count} active reminders',
+                reminder_btn_done: 'Done',
+                reminder_btn_dismiss: 'Dismiss',
+                disease_type_penyakit: 'Disease',
+                disease_type_hama: 'Pest',
+                disease_type_defisiensi: 'Nutrient Deficiency',
+                commodity_sawit: 'Oil Palm',
+                commodity_kakao: 'Cocoa',
+                commodity_kopi: 'Coffee',
+                commodity_karet: 'Rubber',
+                commodity_tebu: 'Sugarcane',
+                share_shared_text: '🌱 SiDiagnosa DIAGNOSIS RESULT\nCommodity: {commodity}\nSymptoms: {symptoms}\n\n',
+                share_entry: '🔹 {disease} ({score}% match)\n   {description}\n   Treatment: {treatment}\n   Consequence: {consequence}\n\n',
+                share_date: '📅 {date}',
+                login_error_blank: 'Email cannot be empty.',
+                login_error_invalid: 'Please enter a valid email address (e.g., name@gmail.com).',
+                confirm_logout: 'Are you sure you want to logout? History will be kept in your account.',
+                confirm_delete: 'Delete this diagnosis record?',
+                confirm_dismiss: 'Delete this reminder?',
+                alert_no_commodity: 'Please select a commodity first.',
+                alert_no_symptom: 'Please describe the symptoms of your plant.',
+                copy_success: 'Diagnosis result copied to clipboard!',
+                share_fallback: 'Diagnosis result copied to clipboard! You can share it with other apps.',
+                type_badge_penyakit: 'Disease',
+                type_badge_hama: 'Pest',
+                type_badge_defisiensi: 'Deficiency',
+                day_names: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                reminder_on_date: 'Diagnosed on {date}',
+                if_not_treated: 'If not treated: {consequence}',
+                sumber: 'Source',
+                back_to_start: 'Back to Start',
+                exit_app: 'Exit',
+                back_to_diagnosa: 'Back to Diagnosis',
+                confirm_exit: 'Are you sure you want to exit the app?',
+                login_success: 'Welcome, {email}!',
+                guest_mode: 'Guest Mode',
+                data_saved: '✓ Data saved in account {email}',
+                data_not_saved: '⚠ Guest Mode: Data will not be saved',
+                no_save_guest: '⚠ Guest Mode - Diagnosis not saved to history',
+                confirm_back_to_start: 'Return to the start page? Current data will be reset.'
+            }
+        };
+
+        let currentLang = localStorage.getItem('siDiagnosa_lang') || 'id';
+
+        function t(key, params) {
+            const lang = currentLang;
+            let text = translations[lang] && translations[lang][key] ? translations[lang][key] : translations['id'][key] || key;
+            if (params) {
+                for (const k in params) text = text.replace(new RegExp('{' + k + '}', 'g'), params[k]);
+            }
+            return text;
+        }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const val = t(key);
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+                    const phKey = el.getAttribute('data-i18n-placeholder');
+                    if (phKey) el.setAttribute('placeholder', t(phKey));
+                } else el.textContent = val;
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
+            });
+            document.getElementById('langToggleLabel').textContent = currentLang.toUpperCase();
+            const commodityMap = { sawit: t('commodity_sawit'), kakao: t('commodity_kakao'), kopi: t('commodity_kopi'),
+                karet: t('commodity_karet'), tebu: t('commodity_tebu') };
+            document.querySelectorAll('#commoditySelect option').forEach(opt => {
+                const val = opt.value;
+                if (val && commodityMap[val]) opt.textContent = commodityMap[val];
+                else if (!val) opt.textContent = t('diagnosa_commodity_ph');
+            });
+            if (currentResults && currentResults.length > 0) {
+                const commodity = document.getElementById('commoditySelect').value;
+                const symptomText = document.getElementById('symptomInput').value.trim();
+                renderHasilDiagnosa(currentResults, commodity, symptomText);
+            }
+            renderCalendar(calYear, calMonth);
+            renderPengingat();
+            updateSaveStatus();
+        }
+
+        function setLanguage(lang) {
+            if (lang === currentLang) return;
+            currentLang = lang;
+            localStorage.setItem('siDiagnosa_lang', lang);
+            applyTranslations();
+        }
+
+        // ================================================================
+        //  KNOWLEDGE BASE - DATA DARI TABEL (55+ ENTRI)
+        //  (Data lengkap sama seperti sebelumnya - disimpan dalam KNOWLEDGE_BASE)
+        // ================================================================
+        const KNOWLEDGE_BASE = [
+            // ---- SAWIT ----
+            {
+                commodity: 'sawit',
+                disease: 'Kumbang Tanduk (Oryctes rhinoceros)',
+                type: 'hama',
+                symptoms: ['potongan', 'pelepah', 'muda', 'bentuk', 'v', 'daun', 'rusak', 'guntingan', 'segitiga'],
+                description: 'Potongan pelepah muda bentuk huruf "V" pada daun tombak; daun rusak berbentuk guntingan segitiga',
+                treatment: '1. Pasang umpan fermentasi (batang pisang + insektisida) 2. Musuh alami: fungus Metarhizium anisopliae 3. Sanitasi material organik di kebun',
+                consequence: 'Kerusakan tunas daun, pertumbuhan terhambat, produksi TBS turun 30-50%, kematian tanaman muda',
+                sumber: 'scholar.unand.ac; eprints.upnyk.ac',
+                en: {
+                    disease: 'Rhinoceros Beetle (Oryctes rhinoceros)',
+                    description: 'Young fronds cut in "V" shape; leaves damaged with triangular cuts',
+                    treatment: '1. Fermented bait (banana stem + insecticide) 2. Natural enemy: Metarhizium anisopliae fungus 3. Sanitation of organic material',
+                    consequence: 'Shoot damage, stunted growth, FFB production drops 30-50%, young plant death'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Ulat Api (Lepidoptera: Limacodidae)',
+                type: 'hama',
+                symptoms: ['daun', 'berlubang', 'bulu', 'beracun', 'iritasi', 'tubuh', 'kecil', 'warna', 'mencolok'],
+                description: 'Daun berlubang, bulu beracun menyebabkan iritasi; tubuh kecil berwarna mencolok',
+                treatment: '1. Insektisida biologis Bacillus thuringiensis 2. Musuh alami: burung, laba-laba 3. Panen manual (dengan proteksi)',
+                consequence: 'Hilangnya daun, fotosintesis terhambat, pertumbuhan lambat, produksi minyak turun',
+                sumber: 'scholar.unand.ac',
+                en: {
+                    disease: 'Nettle Caterpillar (Lepidoptera: Limacodidae)',
+                    description: 'Holes in leaves, poisonous hairs cause irritation; small body with striking colors',
+                    treatment: '1. Bacillus thuringiensis biological insecticide 2. Natural enemies: birds, spiders 3. Manual harvesting (with protection)',
+                    consequence: 'Leaf loss, photosynthesis inhibited, slow growth, oil production decreases'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Ulat Kantong (Lepidoptera: Psychidae)',
+                type: 'hama',
+                symptoms: ['kantong', 'pelindung', 'serat', 'kepala', 'keluar', 'daun', 'rusak'],
+                description: 'Kantong pelindung dari serat; ulat makan dari dalam, hanya keluar kepala',
+                treatment: '1. Insektisida sistemik 2. Musuh alami: Hashima scapularis (kumbang) 3. Sanitasi kantong ulat',
+                consequence: 'Kerusakan daun berat, kanopi tipis, penurunan produktivitas tandan buah',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Bagworm (Lepidoptera: Psychidae)',
+                    description: 'Protective bag made of fibers; caterpillar eats from inside, only head emerges',
+                    treatment: '1. Systemic insecticide 2. Natural enemy: Hashima scapularis (beetle) 3. Sanitize bags',
+                    consequence: 'Severe leaf damage, thin canopy, reduced bunch productivity'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Tikus (Rattus sp.)',
+                type: 'hama',
+                symptoms: ['buah', 'tandan', 'dimakan', 'bekas', 'gigi', 'batang', 'populasi', 'tinggi'],
+                description: 'Buah tandan dimakan, bekas gigi pada batang; populasi tinggi saat musim buah',
+                treatment: '1. Rodentisida targeted 2. Musuh alami: burung pemangsa 3. Sanitasi kebun',
+                consequence: 'Hilangnya buah 20-40%, kualitas minyak turun, kerusakan infrastruktur',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Rats (Rattus sp.)',
+                    description: 'Fruit bunches eaten, teeth marks on trunk; high population during fruiting season',
+                    treatment: '1. Targeted rodenticide 2. Natural enemies: predatory birds 3. Field sanitation',
+                    consequence: 'Fruit loss 20-40%, oil quality decreases, infrastructure damage'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Busuk Batang (Ganoderma annulare)',
+                type: 'penyakit',
+                symptoms: ['bercak', 'coklat', 'batang', 'miselium', 'putih', 'merang', 'lunak', 'berongga'],
+                description: 'Bercak coklat pada batang, miselium putih-merang, batang lunak & berongga',
+                treatment: '1. Kupas & bakar jaringan terserang 2. Fungisida sistemik (carbendazim) 3. Replanting dengan klon tahan',
+                consequence: 'Kematian tanaman 1-2 tahun, kehilangan produksi permanen, penyebaran ke tetangga',
+                sumber: 'jurnal.polinela.ac; scholar.unand.ac',
+                en: {
+                    disease: 'Stem Rot (Ganoderma annulare)',
+                    description: 'Brown spots on stem, white-brown mycelium, soft and hollow stem',
+                    treatment: '1. Peel & burn infected tissue 2. Systemic fungicide (carbendazim) 3. Replant with resistant clones',
+                    consequence: 'Plant death in 1-2 years, permanent production loss, spread to neighboring plants'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Karat Daun (Phytophthora palmivora)',
+                type: 'penyakit',
+                symptoms: ['bercak', 'kuning', 'jingga', 'daun', 'mengering', 'intensitas', '100%'],
+                description: 'Bercak kuning-jingga pada daun, daun mengering, intensitas 100% pada serangan berat',
+                treatment: '1. Fungisida cupric (copper oxychloride) 2. Drainase baik, kurangi kelembaban 3. Pemupukan N cukup',
+                consequence: 'Daun gugur masif, fotosintesis terhenti, produksi turun >50%',
+                sumber: 'scholar.unand.ac',
+                en: {
+                    disease: 'Leaf Rust (Phytophthora palmivora)',
+                    description: 'Yellow-orange spots on leaves, leaves dry, 100% intensity in severe attack',
+                    treatment: '1. Copper fungicide (copper oxychloride) 2. Good drainage, reduce humidity 3. Adequate N fertilization',
+                    consequence: 'Massive defoliation, photosynthesis stops, production drops >50%'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Busuk Pangkal Batang (Ganoderma lucidum)',
+                type: 'penyakit',
+                symptoms: ['tapal', 'jamur', 'coklat', 'merang', 'pangkal', 'batang', 'berongga'],
+                description: 'Tapal jamur coklat-merang di pangkal batang, batang berongga',
+                treatment: '1. Retas & bakar jamur 2. Injeksi fungisida sistemik 3. Replanting dengan klon resisten',
+                consequence: 'Kematian tanaman muda & dewasa, kerugian ekonomi besar/hektar',
+                sumber: 'jurnal.polbangtanmanokwari.ac',
+                en: {
+                    disease: 'Basal Stem Rot (Ganoderma lucidum)',
+                    description: 'Brown-straw fungal plaques at the base, hollow stem',
+                    treatment: '1. Cut & burn fungus 2. Systemic fungicide injection 3. Replant with resistant clones',
+                    consequence: 'Death of young & mature plants, large economic loss per hectare'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Kekurangan Nitrogen (N)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'kuning', 'pucat', 'klorosis', 'ruas', 'pendek', 'akar', 'panjang', 'kecil', 'nekrosis',
+                    'ujung'
+                ],
+                description: 'Daun kuning pucat (klorosis), ruas pendek, pertumbuhan daun lambat, akar panjang tapi kecil, nekrosis ujung',
+                treatment: '1. Pupuk N (urea/ZA) 200-400g/tanaman/tahun 2. Split application 3-4 kali/tahun 3. Tambah bahan organik',
+                consequence: 'Pertumbuhan vegetatif terhambat, daun sedikit & kecil, produksi TBS turun 40-60%',
+                sumber: 'jurnal.instiperjogja.ac; scholar.unand.ac',
+                en: {
+                    disease: 'Nitrogen (N) Deficiency',
+                    description: 'Pale yellow leaves (chlorosis), short internodes, slow leaf growth, long but small roots, tip necrosis',
+                    treatment: '1. N fertilizer (urea/ZA) 200-400g/tree/year 2. Split application 3-4 times/year 3. Add organic matter',
+                    consequence: 'Vegetative growth inhibited, few & small leaves, FFB production drops 40-60%'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Kekurangan Fosfor (P)',
+                type: 'defisiensi',
+                symptoms: ['batang', 'piramida', 'mengecil', 'ke atas', 'daun', 'keunguan', 'akar', 'terhambat'],
+                description: 'Batang berbentuk piramida (mengecil ke atas), daun keunguan, pertumbuhan akar terhambat',
+                treatment: '1. Pupuk P (SP-36/ZF) 150-300g/tanaman 2. Aplikasi saat tanaman muda 3. Kombinasi pupuk organik',
+                consequence: 'Akar pendek & lemah, tanaman rentan stres air, penyerapan hara lain terganggu',
+                sumber: 'scribd',
+                en: {
+                    disease: 'Phosphorus (P) Deficiency',
+                    description: 'Pyramidal stem (narrowing upward), purplish leaves, root growth inhibited',
+                    treatment: '1. P fertilizer (SP-36/ZF) 150-300g/tree 2. Apply at young plant stage 3. Combine with organic fertilizer',
+                    consequence: 'Short & weak roots, plant susceptible to water stress, nutrient uptake disrupted'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Kekurangan Kalium (K)',
+                type: 'defisiensi',
+                symptoms: ['bercak', 'kuning', 'jingga', 'orange', 'spotting', 'tembus', 'cahaya', 'daun', 'tua', 'mengering'],
+                description: 'Bercak kuning-jingga (orange spotting) tembus cahaya pada daun tua, bercak bertambah besar → daun mengering',
+                treatment: '1. Pupuk K (KCl/K₂SO₄) 300-600g/tanaman 2. Aplikasi 2-3 kali/tahun 3. Monitoring status hara daun',
+                consequence: 'Buah kecil, mudah rontok, minyak/tandan turun 30%, kualitas minyak rendah (FFA tinggi)',
+                sumber: 'disbun.kukarkab; jurnal.instiperjogja.ac',
+                en: {
+                    disease: 'Potassium (K) Deficiency',
+                    description: 'Yellow-orange spots (orange spotting) translucent on older leaves, spots enlarge → leaves dry',
+                    treatment: '1. K fertilizer (KCl/K₂SO₄) 300-600g/tree 2. Apply 2-3 times/year 3. Monitor leaf nutrient status',
+                    consequence: 'Small fruits, easily shed, oil/bunch drops 30%, low oil quality (high FFA)'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Kekurangan Magnesium (Mg)',
+                type: 'defisiensi',
+                symptoms: ['hijau', 'kuning', 'pucat', 'ujung', 'tepi', 'daun', 'tua', 'terkena', 'cahaya', 'mengering'],
+                description: 'Hijau-kuning pucat di ujung tepi daun tua (terkena cahaya), daun mengering berat',
+                treatment: '1. Pupuk Mg (Kieserite) 100-200g/tanaman 2. Aplikasi saat daun kuning 3. Kombinasi dengan K',
+                consequence: 'Fotosintesis terhambat, daun mengering, produksi turun 25-40%, kualitas minyak berkurang',
+                sumber: 'disbun.kukarkab',
+                en: {
+                    disease: 'Magnesium (Mg) Deficiency',
+                    description: 'Pale green-yellow at tips/margins of older leaves (light-exposed), severe drying',
+                    treatment: '1. Mg fertilizer (Kieserite) 100-200g/tree 2. Apply when leaves yellow 3. Combine with K',
+                    consequence: 'Photosynthesis inhibited, leaves dry, production drops 25-40%, oil quality decreases'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Kekurangan Boron (B)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'menggulung', 'tunas', 'malformed', 'buah', 'tidak', 'normal', 'akar', 'lemah'],
+                description: 'Daun menggulung, tunas malformed (畸形), buah tidak normal, akar lemah',
+                treatment: '1. Pupuk B (borax) 20-50g/tanaman 2. Foliar spray 3. Monitor bersama Ca',
+                consequence: 'Tunas mati, buah tidak berkembang, produksi hampir nol pada defisiensi berat',
+                sumber: 'scholar.unand.ac',
+                en: {
+                    disease: 'Boron (B) Deficiency',
+                    description: 'Curled leaves, malformed shoots, abnormal fruits, weak roots',
+                    treatment: '1. B fertilizer (borax) 20-50g/tree 2. Foliar spray 3. Monitor with Ca',
+                    consequence: 'Shoots die, fruits fail to develop, production nearly zero in severe deficiency'
+                }
+            },
+            {
+                commodity: 'sawit',
+                disease: 'Kekurangan Kuprum (Cu)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'muda', 'malformed', 'pucuk', 'mati', 'akar', 'hitam'],
+                description: 'Daun muda malformed, pucuk mati, akar hitam',
+                treatment: '1. Pupuk Cu (CuSO₄) 10-25g/tanaman 2. Foliar application',
+                consequence: 'Kematian pucuk, pertumbuhan stop, tanaman muda mati',
+                sumber: 'scholar.unand.ac',
+                en: {
+                    disease: 'Copper (Cu) Deficiency',
+                    description: 'Malformed young leaves, dead shoots, black roots',
+                    treatment: '1. Cu fertilizer (CuSO₄) 10-25g/tree 2. Foliar application',
+                    consequence: 'Shoot death, growth stops, young plants die'
+                }
+            },
+            // ---- KAKAO ----
+            {
+                commodity: 'kakao',
+                disease: 'Penggerak Buah Kakao (PBK) (Conopomorpha cramerella)',
+                type: 'hama',
+                symptoms: ['buah', 'berpori', 'kecil', 'biji', 'hancur', 'mengering', 'busuk'],
+                description: 'Buah berpori kecil, biji hancur, buah mengering/busuk; hama utama Indonesia',
+                treatment: '1. PHT: pemangkasan, panen sering, sanitasi, lokalisasi panen 2. Musuh alami: Habrocytus sp. (wanza) 3. Pestisida nabati/Fero-PBK',
+                consequence: 'Kehilangan biji 40-80%, kualitas cocoa bean turun drastis, kerugian Rp 2-5 miliar/hektar',
+                sumber: 'standardsfacility; repository.ulb.ac',
+                en: {
+                    disease: 'Cocoa Pod Borer (Conopomorpha cramerella)',
+                    description: 'Small pores on pods, seeds destroyed, pods dry/rot; main pest in Indonesia',
+                    treatment: '1. IPM: pruning, frequent harvesting, sanitation, localized harvesting 2. Natural enemy: Habrocytus sp. 3. Botanical pesticides/Fero-PBK',
+                    consequence: 'Seed loss 40-80%, cocoa bean quality drops drastically, loss IDR 2-5 billion/ha'
+                }
+            },
+            {
+                commodity: 'kakao',
+                disease: 'Helopeltis (Helopeltis spp.)',
+                type: 'hama',
+                symptoms: ['buah', 'berkerut', 'bercak', 'coklat', 'hisap', 'cairan', 'buah', 'batang'],
+                description: 'Buah berkerut, bercak coklat, hisap cairan buah/batang; hama penghisap buah utama',
+                treatment: '1. Insektisida sistemik (acetamiprid) 2. Pemangkasan cabang 3. Musuh alami: laba-laba, burung',
+                consequence: 'Buah kerut & hancur, produksi turun 30-50%, kualitas biji buruk',
+                sumber: 'repository.ulb.ac',
+                en: {
+                    disease: 'Helopeltis (Helopeltis spp.)',
+                    description: 'Wrinkled pods, brown spots, sucks fluid from pods/stems; main sucking pest',
+                    treatment: '1. Systemic insecticide (acetamiprid) 2. Prune branches 3. Natural enemies: spiders, birds',
+                    consequence: 'Wrinkled & damaged fruit, production drops 30-50%, poor seed quality'
+                }
+            },
+            {
+                commodity: 'kakao',
+                disease: 'Tupai (Tupaia belangeri)',
+                type: 'hama',
+                symptoms: ['buah', 'dimakan', 'biji', 'hilang', 'bekas', 'gigi', 'batang', 'aktif', 'malam'],
+                description: 'Buah dimakan, biji hilang, bekas gigi pada batang; aktif malam',
+                treatment: '1. Rodentisida targeted 2. Jaring penjebak 3. Sanitasi kebun (hilangkan sarang)',
+                consequence: 'Hilangnya buah 15-30%, kerugian langsung per panen',
+                sumber: 'repository.ulb.ac',
+                en: {
+                    disease: 'Tree Shrew (Tupaia belangeri)',
+                    description: 'Fruits eaten, seeds missing, teeth marks on trunk; active at night',
+                    treatment: '1. Targeted rodenticide 2. Trapping nets 3. Field sanitation (remove nests)',
+                    consequence: 'Fruit loss 15-30%, direct harvest loss'
+                }
+            },
+            {
+                commodity: 'kakao',
+                disease: 'Kutu Hijau (Coccus viridis)',
+                type: 'hama',
+                symptoms: ['kutu', 'hijau', 'pucuk', 'daun', 'buah', 'hisap', 'cairan', 'embun', 'madu', 'jelaga'],
+                description: 'Kutu hijau di pucuk/daun/buah, hisap cairan, embun madu → jamur jelaga',
+                treatment: '1. Insektisida kontak (pirimifos-metil) 2. Musuh alami: Coccidophagus sp. 3. Air sabun + minyak',
+                consequence: 'Daun keriting, pertumbuhan lambat, buah kecil, fotosintesis terhambat',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Green Scale (Coccus viridis)',
+                    description: 'Green scales on shoots/leaves/fruits, suck sap, honeydew → sooty mold',
+                    treatment: '1. Contact insecticide (pirimiphos-methyl) 2. Natural enemy: Coccidophagus sp. 3. Soap + oil spray',
+                    consequence: 'Curled leaves, slow growth, small fruits, photosynthesis inhibited'
+                }
+            },
+            {
+                commodity: 'kakao',
+                disease: 'Busuk Buah (Phytophthora palmivora)',
+                type: 'penyakit',
+                symptoms: ['buah', 'coklat', 'hitam', 'busuk', 'lunak', 'miselium', 'putih', 'hujan'],
+                description: 'Buah coklat-hitam, busuk lunak, miselium putih; menyebar cepat saat hujan',
+                treatment: '1. Fungisida cupric (copper hydroxide) 2. Panen & bakar buah busuk 3. Drainase baik, kurangi kelembaban',
+                consequence: 'Buah busuk masif 50-70%, produksi hilang, penyebaran ke tanaman lain',
+                sumber: 'repository.ulb.ac',
+                en: {
+                    disease: 'Phytophthora Pod Rot',
+                    description: 'Brown-black pods, soft rot, white mycelium; spreads rapidly in rain',
+                    treatment: '1. Copper fungicide (copper hydroxide) 2. Harvest & burn rotten pods 3. Good drainage, reduce humidity',
+                    consequence: 'Massive pod rot 50-70%, production lost, spread to other plants'
+                }
+            },
+            {
+                commodity: 'kakao',
+                disease: 'Venturia (Venturia areolata)',
+                type: 'penyakit',
+                symptoms: ['bercak', 'coklat', 'kehitaman', 'daun', 'buah', 'gugur'],
+                description: 'Bercak coklat-kehitaman pada daun & buah, daun gugur',
+                treatment: '1. Fungisida sistemik (mancozeb) 2. Pemangkasan untuk sirkulasi udara 3. Pupuk N cukup',
+                consequence: 'Daun gugur, fotosintesis hilang, produksi turun 30%',
+                sumber: 'repository.ulb.ac',
+                en: {
+                    disease: 'Venturia (Venturia areolata)',
+                    description: 'Dark brown spots on leaves & fruits, leaves fall',
+                    treatment: '1. Systemic fungicide (mancozeb) 2. Prune for air circulation 3. Adequate N fertilizer',
+                    consequence: 'Leaf drop, photosynthesis lost, production drops 30%'
+                }
+            },
+            {
+                commodity: 'kakao',
+                disease: 'Karbon (Colletotrichum gloeospori)',
+                type: 'penyakit',
+                symptoms: ['bercak', 'hitam', 'buah', 'kering', 'hancur'],
+                description: 'Bercak hitam pada buah, buah kering & hancur',
+                treatment: '1. Fungisida kontak 2. Sanitasi buah terserang 3. Kurangi kelembaban',
+                consequence: 'Buah hancur, produksi turun 20-40%',
+                sumber: 'repository.ulb.ac',
+                en: {
+                    disease: 'Carbon (Colletotrichum gloeospori)',
+                    description: 'Black spots on pods, pods dry and crumble',
+                    treatment: '1. Contact fungicide 2. Sanitize affected pods 3. Reduce humidity',
+                    consequence: 'Pods crumble, production drops 20-40%'
+                }
+            },
+            {
+                commodity: 'kakao',
+                disease: 'Kekurangan Nitrogen (N)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'kuning', 'pucat', 'pertumbuhan', 'lambat', 'cabang', 'pendek'],
+                description: 'Daun kuning pucat, pertumbuhan lambat, cabang pendek',
+                treatment: '1. Pupuk Urea 150-300g/tanaman 2. Split application 3-4 kali 3. Pupuk organik',
+                consequence: 'Pertumbuhan vegetatif stop, daun sedikit, produksi kacang 40-60% turun',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Nitrogen (N) Deficiency',
+                    description: 'Pale yellow leaves, slow growth, short branches',
+                    treatment: '1. Urea fertilizer 150-300g/tree 2. Split application 3-4 times 3. Organic fertilizer',
+                    consequence: 'Vegetative growth stops, few leaves, bean production drops 40-60%'
+                }
+            },
+            {
+                commodity: 'kakao',
+                disease: 'Kekurangan Fosfor (P)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'kekuningan', 'akar', 'pendek', 'tanaman', 'lemah'],
+                description: 'Daun kekuningan, akar pendek, tanaman lemah',
+                treatment: '1. SP-36 100-200g/tanaman 2. Aplikasi saat tanaman muda',
+                consequence: 'Akar lemah, tanaman stres air, penyerapan hara lain terganggu',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Phosphorus (P) Deficiency',
+                    description: 'Yellowish leaves, short roots, weak plants',
+                    treatment: '1. SP-36 100-200g/tree 2. Apply at young plant stage',
+                    consequence: 'Weak roots, water stress, nutrient uptake disrupted'
+                }
+            },
+            {
+                commodity: 'kakao',
+                disease: 'Kekurangan Kalium (K)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'mengering', 'bercak', 'nekrosis', 'buah', 'kecil'],
+                description: 'Daun mengering, bercak nekrosis, buah kecil',
+                treatment: '1. KCl 200-400g/tanaman 2. 2-3 kali/tahun',
+                consequence: 'Buah kecil, kualitas biji buruk, produksi turun 30-50%',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Potassium (K) Deficiency',
+                    description: 'Leaves dry, necrotic spots, small fruits',
+                    treatment: '1. KCl 200-400g/tree 2. 2-3 times/year',
+                    consequence: 'Small fruits, poor seed quality, production drops 30-50%'
+                }
+            },
+            {
+                commodity: 'kakao',
+                disease: 'Kekurangan Magnesium (Mg)',
+                type: 'defisiensi',
+                symptoms: ['garis', 'hijau', 'daun', 'kurus', 'kekuningan'],
+                description: 'Garis hijau pada daun, daun kurus kekuningan',
+                treatment: '1. Kieserite 100-150g/tanaman 2. Foliar spray',
+                consequence: 'Fotosintesis terhambat, produksi turun 25%',
+                sumber: 'sipora.polije.ac',
+                en: {
+                    disease: 'Magnesium (Mg) Deficiency',
+                    description: 'Green lines on leaves, thin yellowish leaves',
+                    treatment: '1. Kieserite 100-150g/tree 2. Foliar spray',
+                    consequence: 'Photosynthesis inhibited, production drops 25%'
+                }
+            },
+            // ---- KOPI ----
+            {
+                commodity: 'kopi',
+                disease: 'Penggerak Buah Kopi (PBK) (Hypothenemus hampei)',
+                type: 'hama',
+                symptoms: ['buah', 'berpori', 'kecil', 'biji', 'hancur', 'dalam', 'mengering', 'gugur', 'kumbang',
+                'hitam'],
+                description: 'Buah berpori kecil, biji hancur dari dalam, buah mengering & gugur; kumbang hitam 1mm',
+                treatment: '1. Panen sering (hanyutkan buah terserang) 2. Musuh alami: Cephalotenus sp. 3. Trap buah terserang 4. Insektisida jika berat',
+                consequence: 'Biji hancur 30-60%, kualitas kopi turun drastis, kerugian ekonomi besar',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Coffee Berry Borer (Hypothenemus hampei)',
+                    description: 'Small pores on fruits, seeds destroyed from inside, fruits dry & drop; 1mm black beetle',
+                    treatment: '1. Frequent harvesting (submerge infested fruits) 2. Natural enemy: Cephalotenus sp. 3. Trap infested fruits 4. Insecticide if severe',
+                    consequence: 'Seeds damaged 30-60%, coffee quality drops drastically, large economic loss'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Penggerak Batang Kopi (Zeuzera coffeae)',
+                type: 'hama',
+                symptoms: ['bekas', 'gerekan', 'batang', 'ranting', 'mengering', 'patah', 'ulat', 'putih', 'krem'],
+                description: 'Bekas gerekan batang/ranting, batang mengering & patah, ulat putih-krem besar',
+                treatment: '1. Insektisida sistemik 2. Steril batang terserang 3. Musuh alami: Xylomelum sp.',
+                consequence: 'Batang patah, tanaman mati, kehilangan produksi permanen',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Coffee Stem Borer (Zeuzera coffeae)',
+                    description: 'Borer holes in stems/branches, branches dry & break, large white-cream caterpillar',
+                    treatment: '1. Systemic insecticide 2. Sterilize infected stems 3. Natural enemy: Xylomelum sp.',
+                    consequence: 'Stems break, plants die, permanent production loss'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Kutu Hijau (Coccus viridis)',
+                type: 'hama',
+                symptoms: ['kutu', 'hijau', 'pucuk', 'daun', 'buah', 'hisap', 'cairan', 'embun', 'madu', 'jelaga'],
+                description: 'Kutu hijau di pucuk/daun/buah, hisap cairan, embun madu → jamur jelaga',
+                treatment: '1. Insektisida kontak 2. Musuh alami: Coccidophagus 3. Air sabun + minyak',
+                consequence: 'Daun keriting, pertumbuhan lambat, buah kecil',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Green Scale (Coccus viridis)',
+                    description: 'Green scales on shoots/leaves/fruits, suck sap, honeydew → sooty mold',
+                    treatment: '1. Contact insecticide 2. Natural enemy: Coccidophagus 3. Soap + oil spray',
+                    consequence: 'Curled leaves, slow growth, small fruits'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Miner Daun (Liriomyza sp.)',
+                type: 'hama',
+                symptoms: ['bercak', 'putih', 'transparan', 'daun', 'terowongan', 'larva', 'kusam'],
+                description: 'Bercak putih-transparan pada daun (terowongan larva), daun kusam',
+                treatment: '1. Insektisida kontak 2. Musuh alami: Pennecis sp. 3. Sanitasi daun terserang',
+                consequence: 'Fotosintesis berkurang, daun gugur, produksi turun 20%',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Leaf Miner (Liriomyza sp.)',
+                    description: 'White-transparent spots on leaves (larval tunnels), dull leaves',
+                    treatment: '1. Contact insecticide 2. Natural enemy: Pennecis sp. 3. Sanitize affected leaves',
+                    consequence: 'Photosynthesis reduced, leaves fall, production drops 20%'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Cercospora (Cercospora coffeicola)',
+                type: 'penyakit',
+                symptoms: ['bercak', 'kuning', 'coklat', 'daun', 'gugur'],
+                description: 'Bercak kuning-coklat pada daun, daun gugur',
+                treatment: '1. Fungisida mancozeb 2. Pupuk N cukup 3. Drainase baik',
+                consequence: 'Daun gugur masif, fotosintesis hilang, produksi turun 30-40%',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Cercospora (Cercospora coffeicola)',
+                    description: 'Yellow-brown spots on leaves, leaves fall',
+                    treatment: '1. Mancozeb fungicide 2. Adequate N fertilizer 3. Good drainage',
+                    consequence: 'Massive leaf drop, photosynthesis lost, production drops 30-40%'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Rust/Karat Daun (Hemileia vastatrix)',
+                type: 'penyakit',
+                symptoms: ['bercak', 'kuning', 'oranye', 'daun', 'bawah', 'gugur'],
+                description: 'Bercak kuning-oranye pada daun bawah, daun gugur',
+                treatment: '1. Fungisida cupric 2. Klon tahan 3. Pemangkasan',
+                consequence: 'Daun gugur 50-80%, tanaman mati, produksi hilang 60-90%',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Coffee Leaf Rust (Hemileia vastatrix)',
+                    description: 'Yellow-orange spots on lower leaf surface, leaves fall',
+                    treatment: '1. Copper fungicide 2. Resistant clones 3. Pruning',
+                    consequence: 'Leaf drop 50-80%, plants die, production lost 60-90%'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Phoma (Phoma costarricensis)',
+                type: 'penyakit',
+                symptoms: ['bercak', 'coklat', 'hitam', 'daun', 'buah', 'busuk'],
+                description: 'Bercak coklat-hitam pada daun & buah, buah busuk',
+                treatment: '1. Fungisida sistemik 2. Sanitasi buah terserang',
+                consequence: 'Buah busuk 30-50%, kualitas biji buruk',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Phoma (Phoma costarricensis)',
+                    description: 'Dark brown-black spots on leaves & fruits, fruit rot',
+                    treatment: '1. Systemic fungicide 2. Sanitize affected fruits',
+                    consequence: 'Fruit rot 30-50%, poor seed quality'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Kekurangan Nitrogen (N)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'hijau', 'kekuningan', 'pangkal', 'mengering'],
+                description: 'Daun hijau kekuningan, pangkal daun mengering',
+                treatment: '1. Urea 100-200g/tanaman 2. 3-4 kali/tahun',
+                consequence: 'Daun kecil, pertumbuhan lambat, produksi turun 40-50%',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Nitrogen (N) Deficiency',
+                    description: 'Greenish-yellow leaves, leaf base dries',
+                    treatment: '1. Urea 100-200g/tree 2. 3-4 times/year',
+                    consequence: 'Small leaves, slow growth, production drops 40-50%'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Kekurangan Fosfor (P)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'kekuningan', 'akar', 'pendek'],
+                description: 'Daun kekuningan, akar pendek',
+                treatment: '1. SP-36 100-150g/tanaman',
+                consequence: 'Akar lemah, produksi turun 25%',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Phosphorus (P) Deficiency',
+                    description: 'Yellowish leaves, short roots',
+                    treatment: '1. SP-36 100-150g/tree',
+                    consequence: 'Weak roots, production drops 25%'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Kekurangan Kalium (K)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'mengering', 'bercak', 'nekrosis'],
+                description: 'Daun mengering, bercak nekrosis',
+                treatment: '1. KCl 150-300g/tanaman',
+                consequence: 'Buah kecil, kualitas biji buruk, produksi turun 30%',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Potassium (K) Deficiency',
+                    description: 'Leaves dry, necrotic spots',
+                    treatment: '1. KCl 150-300g/tree',
+                    consequence: 'Small fruits, poor seed quality, production drops 30%'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Kekurangan Kalsium (Ca)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'kuning', 'lalu', 'kering', 'tepi', 'nekrosis'],
+                description: 'Daun kuning lalu kering, tepi daun nekrosis',
+                treatment: '1. Kalsium nitrat 100-150g/tanaman',
+                consequence: 'Daun kering, pertumbuhan stop',
+                sumber: 'sipora.polije.ac',
+                en: {
+                    disease: 'Calcium (Ca) Deficiency',
+                    description: 'Leaves yellow then dry, margins necrotic',
+                    treatment: '1. Calcium nitrate 100-150g/tree',
+                    consequence: 'Leaves dry, growth stops'
+                }
+            },
+            {
+                commodity: 'kopi',
+                disease: 'Kekurangan Magnesium (Mg)',
+                type: 'defisiensi',
+                symptoms: ['garis', 'hijau', 'daun', 'kurus', 'kekuningan'],
+                description: 'Garis hijau pada daun, daun kurus kekuningan',
+                treatment: '1. Kieserite 50-100g/tanaman',
+                consequence: 'Fotosintesis terhambat',
+                sumber: 'sipora.polije.ac',
+                en: {
+                    disease: 'Magnesium (Mg) Deficiency',
+                    description: 'Green lines on leaves, thin yellowish leaves',
+                    treatment: '1. Kieserite 50-100g/tree',
+                    consequence: 'Photosynthesis inhibited'
+                }
+            },
+            // ---- KARET ----
+            {
+                commodity: 'karet',
+                disease: 'Kutung (Aulacoccus sp.)',
+                type: 'hama',
+                symptoms: ['kutu', 'putih', 'pucuk', 'batang', 'hisap', 'cairan', 'embun', 'madu'],
+                description: 'Kutu putih di pucuk/batang, hisap cairan, ekskresi embun madu',
+                treatment: '1. Insektisida kontak 2. Musuh alami: Cryptolaemus',
+                consequence: 'Daun keriting, pertumbuhan lambat, sadapan berkurang',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Mealybug (Aulacoccus sp.)',
+                    description: 'White scales on shoots/stems, suck sap, excrete honeydew',
+                    treatment: '1. Contact insecticide 2. Natural enemy: Cryptolaemus',
+                    consequence: 'Curled leaves, slow growth, reduced tapping'
+                }
+            },
+            {
+                commodity: 'karet',
+                disease: 'Tikus (Rattus sp.)',
+                type: 'hama',
+                symptoms: ['batang', 'digigit', 'sadapan', 'rusak', 'getah', 'hilang'],
+                description: 'Batang digigit, sadapan rusak, getah hilang',
+                treatment: '1. Rodentisida 2. Jaring penjebak',
+                consequence: 'Sadapan rusak, produksi getah hilang 20-30%',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Rats (Rattus sp.)',
+                    description: 'Stems gnawed, tapping panels damaged, latex lost',
+                    treatment: '1. Rodenticide 2. Trapping nets',
+                    consequence: 'Tapping panels damaged, latex production lost 20-30%'
+                }
+            },
+            {
+                commodity: 'karet',
+                disease: 'Gugur Daun Karet (PGDP) (Pestalotiopsis sp.)',
+                type: 'penyakit',
+                symptoms: ['bercak', 'kecoklatan', 'halo', 'kuning', 'tengah', 'coklat', 'hitam', 'hawar', 'gugur', 'masif',
+                    'kanopi', 'tipis'
+                ],
+                description: 'Bercak kecoklatan dengan halo kuning, tengah coklat-hitam, bercak bergabung→hawar, daun gugur masif, kanopi tipis',
+                treatment: '1. Fungisida sistemik (fogging/pengabutan ke tajuk) 2. Beban penyadapan sesuai klon 3. Drainase, kurangi kelembaban 4. Pupuk nutrisi cukup',
+                consequence: 'Produksi turun 25-80%, cabang & tajuk mati, daun gugur sebelum waktunya',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Leaf Fall Disease (Pestalotiopsis sp.)',
+                    description: 'Brown spots with yellow halo, center dark brown-black, spots coalesce→blight, massive defoliation, thin canopy',
+                    treatment: '1. Systemic fungicide (fogging to canopy) 2. Tapping load according to clone 3. Drainage, reduce humidity 4. Adequate nutrients',
+                    consequence: 'Production drops 25-80%, branches & canopy die, premature leaf fall'
+                }
+            },
+            {
+                commodity: 'karet',
+                disease: 'Hawar Daun (Colletotrichum gloeospori)',
+                type: 'penyakit',
+                symptoms: ['bercak', 'hitam', 'daun', 'mengering', 'gugur'],
+                description: 'Bercak hitam pada daun, daun mengering & gugur',
+                treatment: '1. Fungisida cupric 2. Pupuk N cukup',
+                consequence: 'Daun gugur, produksi turun 20-30%',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Leaf Blight (Colletotrichum gloeospori)',
+                    description: 'Black spots on leaves, leaves dry and fall',
+                    treatment: '1. Copper fungicide 2. Adequate N fertilizer',
+                    consequence: 'Leaves fall, production drops 20-30%'
+                }
+            },
+            {
+                commodity: 'karet',
+                disease: 'Kekurangan Nitrogen (N)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'pucat', 'hijau', 'kuning', 'klorosis', 'tua', 'gugur'],
+                description: 'Daun pucat hijau-kuning, terakhir kuning seluruhnya (klorosis); daun tua gugur dulu',
+                treatment: '1. Urea 150-250g/tanaman 2. 3-4 kali/tahun',
+                consequence: 'Daun kuning, gugur masif, pertumbuhan vegetatif stop, produksi getah turun 40-50%',
+                sumber: 'triasbodro.blogspot',
+                en: {
+                    disease: 'Nitrogen (N) Deficiency',
+                    description: 'Pale green-yellow leaves, eventually all yellow (chlorosis); older leaves fall first',
+                    treatment: '1. Urea 150-250g/tree 2. 3-4 times/year',
+                    consequence: 'Yellow leaves, massive drop, vegetative growth stops, latex production drops 40-50%'
+                }
+            },
+            {
+                commodity: 'karet',
+                disease: 'Kekurangan Fosfor (P)',
+                type: 'defisiensi',
+                symptoms: ['warna', 'perunggu', 'bawah', 'daun', 'nekrosis', 'ujung'],
+                description: 'Warna daun perunggu di bagian bawah daun, nekrosis dari ujung daun',
+                treatment: '1. SP-36 100-150g/tanaman',
+                consequence: 'Akar pendek, tanaman lemah, produksi turun 25%',
+                sumber: 'triasbodro.blogspot',
+                en: {
+                    disease: 'Phosphorus (P) Deficiency',
+                    description: 'Bronze coloration on lower leaf surface, necrosis from leaf tips',
+                    treatment: '1. SP-36 100-150g/tree',
+                    consequence: 'Short roots, weak plants, production drops 25%'
+                }
+            },
+            {
+                commodity: 'karet',
+                disease: 'Kekurangan Kalium (K)',
+                type: 'defisiensi',
+                symptoms: ['ujung', 'daun', 'pinggir', 'klorosis', 'nekrosis', 'bercak', 'coklat', 'bolong'],
+                description: 'Ujung daun pinggir klorosis→nekrosis, bercak coklat, ujung kuning→membusuk & bolong',
+                treatment: '1. KCl 200-300g/tanaman',
+                consequence: 'Daun bolong, fotosintesis hilang, produksi getah turun 30-40%',
+                sumber: 'triasbodro.blogspot',
+                en: {
+                    disease: 'Potassium (K) Deficiency',
+                    description: 'Leaf margins chlorosis→necrosis, brown spots, yellow tips→rot & holes',
+                    treatment: '1. KCl 200-300g/tree',
+                    consequence: 'Holes in leaves, photosynthesis lost, latex production drops 30-40%'
+                }
+            },
+            {
+                commodity: 'karet',
+                disease: 'Kekurangan Kalsium (Ca)',
+                type: 'defisiensi',
+                symptoms: ['pembuluh', 'daun', 'coklat', 'tulang', 'ikan', 'tepi', 'menguning'],
+                description: 'Pembuluh daun coklat→tulang daun kelihatan ("tulang ikan"), tepi & seluruh daun menguning',
+                treatment: '1. Kalsium nitrat 100-150g/tanaman',
+                consequence: 'Tulang ikan, daun menguning, pertumbuhan stop',
+                sumber: 'triasbodro.blogspot',
+                en: {
+                    disease: 'Calcium (Ca) Deficiency',
+                    description: 'Leaf veins brown→veins become visible ("fishbone"), margins & whole leaf yellow',
+                    treatment: '1. Calcium nitrate 100-150g/tree',
+                    consequence: 'Fishbone appearance, yellow leaves, growth stops'
+                }
+            },
+            // ---- TEBU ----
+            {
+                commodity: 'tebu',
+                disease: 'Penggerak Pucuk Tebu (Scirphophaga excerptalis)',
+                type: 'hama',
+                symptoms: ['pucuk', 'berlubang', 'terowongan', 'batang', 'lemah', 'patah', 'larva', 'putih', 'krem'],
+                description: 'Pucuk berlubang, terowongan dalam batang, pucuk lemah & patah, larva putih-krem kecil',
+                treatment: '1. Insektisida sistemik (acetamiprid) 2. Panen pucuk terserang 3. Musuh alami: Trichogramma sp.',
+                consequence: 'Pucuk patah, pertumbuhan stop, produksi gula turun 30-50%',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Shoot Borer (Scirphophaga excerptalis)',
+                    description: 'Holes in shoots, tunnels in stems, weak & broken shoots, small white-cream larvae',
+                    treatment: '1. Systemic insecticide (acetamiprid) 2. Harvest affected shoots 3. Natural enemy: Trichogramma sp.',
+                    consequence: 'Shoots break, growth stops, sugar production drops 30-50%'
+                }
+            },
+            {
+                commodity: 'tebu',
+                disease: 'Penggerak Batang Tebu (Chilo sacchariphagus)',
+                type: 'hama',
+                symptoms: ['batang', 'berlubang', 'terowongan', 'lemah', 'patah'],
+                description: 'Batang berlubang, terowongan dalam, batang lemah & patah',
+                treatment: '1. Insektisida sistemik 2. Steril batang terserang 3. Musuh alami: Trichogramma',
+                consequence: 'Batang patah, produksi gula turun 40-60%, tanaman mati',
+                sumber: 'eprints.upnyk.ac',
+                en: {
+                    disease: 'Stem Borer (Chilo sacchariphagus)',
+                    description: 'Holes in stems, tunnels, weak & broken stems',
+                    treatment: '1. Systemic insecticide 2. Sterilize infected stems 3. Natural enemy: Trichogramma',
+                    consequence: 'Stems break, sugar production drops 40-60%, plants die'
+                }
+            },
+            {
+                commodity: 'tebu',
+                disease: 'Kutu Dompolan (Schizostecnum sp.)',
+                type: 'hama',
+                symptoms: ['kutu', 'putih', 'dompol', 'batang', 'daun', 'hisap', 'cairan'],
+                description: 'Kutu putih dompol di batang/daun, hisap cairan',
+                treatment: '1. Insektisida kontak 2. Musuh alami',
+                consequence: 'Batang lemah, pertumbuhan lambat, produksi turun 20%',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Mealybug (Schizostecnum sp.)',
+                    description: 'White mealybug clusters on stems/leaves, suck sap',
+                    treatment: '1. Contact insecticide 2. Natural enemies',
+                    consequence: 'Weak stems, slow growth, production drops 20%'
+                }
+            },
+            {
+                commodity: 'tebu',
+                disease: 'Kutu Hijau (Coccus viridis)',
+                type: 'hama',
+                symptoms: ['kutu', 'hijau', 'pucuk', 'daun', 'hisap', 'cairan', 'embun', 'madu', 'jelaga'],
+                description: 'Kutu hijau di pucuk/daun, hisap cairan, embun madu → jamur jelaga',
+                treatment: '1. Insektisida kontak 2. Musuh alami',
+                consequence: 'Daun keriting, fotosintesis terhambat',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Green Scale (Coccus viridis)',
+                    description: 'Green scales on shoots/leaves, suck sap, honeydew → sooty mold',
+                    treatment: '1. Contact insecticide 2. Natural enemies',
+                    consequence: 'Curled leaves, photosynthesis inhibited'
+                }
+            },
+            {
+                commodity: 'tebu',
+                disease: 'Kuning Daun TEBU (Leifsonia pilea)',
+                type: 'penyakit',
+                symptoms: ['daun', 'kuning', 'pucuk', 'mati', 'batang', 'lemah'],
+                description: 'Daun kuning, pucuk mati, batang lemah',
+                treatment: '1. Bibit sehat 2. Rotasi tanaman 3. Fungisida jika berat',
+                consequence: 'Daun kuning masif, produksi gula turun 50-70%',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Sugarcane Yellow Leaf (Leifsonia pilea)',
+                    description: 'Yellow leaves, dead shoots, weak stems',
+                    treatment: '1. Healthy seedlings 2. Crop rotation 3. Fungicide if severe',
+                    consequence: 'Massive yellow leaves, sugar production drops 50-70%'
+                }
+            },
+            {
+                commodity: 'tebu',
+                disease: 'Hawar Daun (Cercospora sp.)',
+                type: 'penyakit',
+                symptoms: ['bercak', 'putih', 'coklat', 'daun', 'mengering'],
+                description: 'Bercak putih-coklat pada daun, daun mengering',
+                treatment: '1. Fungisida mancozeb 2. Pupuk N cukup',
+                consequence: 'Daun mengering, fotosintesis hilang, produksi turun 25-35%',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Leaf Blight (Cercospora sp.)',
+                    description: 'White-brown spots on leaves, leaves dry',
+                    treatment: '1. Mancozeb fungicide 2. Adequate N fertilizer',
+                    consequence: 'Leaves dry, photosynthesis lost, production drops 25-35%'
+                }
+            },
+            {
+                commodity: 'tebu',
+                disease: 'Kekurangan Nitrogen (N)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'kuning', 'pucat', 'pertumbuhan', 'lambat'],
+                description: 'Daun kuning pucat, pertumbuhan lambat',
+                treatment: '1. Urea 150-250g/tanaman',
+                consequence: 'Daun kecil, produksi gula turun 40%',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Nitrogen (N) Deficiency',
+                    description: 'Pale yellow leaves, slow growth',
+                    treatment: '1. Urea 150-250g/tree',
+                    consequence: 'Small leaves, sugar production drops 40%'
+                }
+            },
+            {
+                commodity: 'tebu',
+                disease: 'Kekurangan Fosfor (P)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'kekuningan', 'akar', 'pendek'],
+                description: 'Daun kekuningan, akar pendek',
+                treatment: '1. SP-36 100-150g/tanaman',
+                consequence: 'Akar lemah, produksi turun 25%',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Phosphorus (P) Deficiency',
+                    description: 'Yellowish leaves, short roots',
+                    treatment: '1. SP-36 100-150g/tree',
+                    consequence: 'Weak roots, production drops 25%'
+                }
+            },
+            {
+                commodity: 'tebu',
+                disease: 'Kekurangan Kalium (K)',
+                type: 'defisiensi',
+                symptoms: ['daun', 'mengering', 'bercak', 'nekrosis'],
+                description: 'Daun mengering, bercak nekrosis',
+                treatment: '1. KCl 200-300g/tanaman',
+                consequence: 'Batang kecil, gula turun 30%',
+                sumber: 'repository.unsri.ac',
+                en: {
+                    disease: 'Potassium (K) Deficiency',
+                    description: 'Leaves dry, necrotic spots',
+                    treatment: '1. KCl 200-300g/tree',
+                    consequence: 'Small stems, sugar drops 30%'
+                }
+            },
+            {
+                commodity: 'tebu',
+                disease: 'Kekurangan Seng (Zn)',
+                type: 'defisiensi',
+                symptoms: ['klorosis', 'daun', 'kuning', 'kecoklatan', 'kering', 'fotosintesis', 'terganggu'],
+                description: 'Klorosis pada daun, kuning kecoklatan, daun kering, fotosintesis terganggu',
+                treatment: '1. ZnSO₄ 20-30g/tanaman 2. Foliar spray',
+                consequence: 'Fotosintesis terganggu, pertumbuhan stop, produksi gula turun 35%',
+                sumber: 'scribd',
+                en: {
+                    disease: 'Zinc (Zn) Deficiency',
+                    description: 'Chlorosis on leaves, yellow-brown, dry leaves, photosynthesis disrupted',
+                    treatment: '1. ZnSO₄ 20-30g/tree 2. Foliar spray',
+                    consequence: 'Photosynthesis disrupted, growth stops, sugar production drops 35%'
+                }
+            }
+        ];
+
+        // ================================================================
+        //  STATE & LOGIC
+        // ================================================================
+        let currentUser = null;
+        let isGuest = true;
+        let riwayat = [];
+        let pengingat = [];
+        let calYear = new Date().getFullYear();
+        let calMonth = new Date().getMonth();
+        let selectedDate = null;
+        let currentResults = [];
+
+        function getStoragePrefix() {
+            if (isGuest || !currentUser) {
+                return 'guest_temp';
+            }
+            return `user_${currentUser.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
+        }
+
+        function isDataPersistent() {
+            return !isGuest && currentUser !== null;
+        }
+
+        function loadData() {
+            riwayat = [];
+            pengingat = [];
+
+            if (!isDataPersistent()) {
+                return;
+            }
+
+            const prefix = getStoragePrefix();
+            const riwayatStr = localStorage.getItem(`siDiagnosa_riwayat_${prefix}`);
+            const pengingatStr = localStorage.getItem(`siDiagnosa_pengingat_${prefix}`);
+
+            try {
+                riwayat = riwayatStr ? JSON.parse(riwayatStr) : [];
+            } catch (e) {
+                riwayat = [];
+            }
+
+            try {
+                pengingat = pengingatStr ? JSON.parse(pengingatStr) : [];
+            } catch (e) {
+                pengingat = [];
+            }
+
+            pengingat = pengingat.map(p => {
+                if (!p.id) p.id = 'r_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                return p;
+            });
+
+            riwayat = riwayat.map(r => {
+                if (!r.id) r.id = 'h_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                return r;
+            });
+
+            saveData();
+        }
+
+        function saveData() {
+            if (!isDataPersistent()) {
+                return;
+            }
+
+            const prefix = getStoragePrefix();
+            localStorage.setItem(`siDiagnosa_riwayat_${prefix}`, JSON.stringify(riwayat));
+            localStorage.setItem(`siDiagnosa_pengingat_${prefix}`, JSON.stringify(pengingat));
+        }
+
+        function formatDate(d) {
+            const y = d.getFullYear(),
+                m = String(d.getMonth() + 1).padStart(2, '0'),
+                day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function formatDateReadable(d) {
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober',
+                'November', 'Desember'
+            ];
+            const monthsEn = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+                'November', 'December'
+            ];
+            const monthsLocal = currentLang === 'en' ? monthsEn : months;
+            return `${d.getDate()} ${monthsLocal[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        function getToday() {
+            const d = new Date();
+            return formatDate(d);
+        }
+
+        function getCommodityLabel(val) {
+            const map = { sawit: 'sawit', kakao: 'kakao', kopi: 'kopi', karet: 'karet', tebu: 'tebu' };
+            const key = map[val] || val;
+            return t('commodity_' + key);
+        }
+
+        function getTypeLabel(type) {
+            const map = { penyakit: 'penyakit', hama: 'hama', defisiensi: 'defisiensi' };
+            return t('disease_type_' + map[type] || type);
+        }
+
+        function getTypeBadge(type) {
+            const map = { penyakit: 'penyakit', hama: 'hama', defisiensi: 'defisiensi' };
+            return map[type] || 'penyakit';
+        }
+
+        function getLocalizedEntry(entry, field) {
+            if (currentLang === 'en' && entry.en && entry.en[field]) {
+                return entry.en[field];
+            }
+            return entry[field];
+        }
+
+        function updateSaveStatus() {
+            const statusDiv = document.getElementById('saveStatus');
+            const statusText = document.getElementById('saveStatusText');
+            if (isDataPersistent()) {
+                statusDiv.style.display = 'block';
+                statusText.textContent = t('data_saved', { email: currentUser });
+                statusDiv.style.color = '#2a6b52';
+            } else {
+                statusDiv.style.display = 'block';
+                statusText.textContent = t('data_not_saved');
+                statusDiv.style.color = '#b86b1f';
+            }
+        }
+
+        // DIAGNOSA ENGINE
+        function diagnose(commodity, text) {
+            const lowerText = text.toLowerCase();
+            const words = lowerText.split(/\s+/);
+            const results = [];
+
+            for (const entry of KNOWLEDGE_BASE) {
+                if (entry.commodity !== commodity) continue;
+                let matchCount = 0;
+                const totalKeywords = entry.symptoms.length;
+                for (const sym of entry.symptoms) {
+                    if (lowerText.includes(sym)) matchCount++;
+                }
+                for (const w of words) {
+                    if (w.length < 3) continue;
+                    for (const sym of entry.symptoms) {
+                        if (sym.includes(w) && !lowerText.includes(sym)) {
+                            matchCount += 0.5;
+                        }
+                    }
+                }
+                let score = 0;
+                if (totalKeywords > 0) {
+                    score = Math.min(100, Math.round((matchCount / totalKeywords) * 100));
+                }
+                if (score > 0) {
+                    results.push({
+                        ...entry,
+                        matchCount,
+                        score,
+                        matchedSymptoms: entry.symptoms.filter(s => lowerText.includes(s))
+                    });
+                }
+            }
+
+            results.sort((a, b) => b.score - a.score);
+            return results;
+        }
+
+        // RENDER HASIL
+        function renderHasilDiagnosa(results, commodity, text) {
+            const container = document.getElementById('hasilContainer');
+            const hasilDiv = document.getElementById('hasilDiagnosa');
+            const sub = document.getElementById('hasilSub');
+            const actionButtons = document.getElementById('actionButtons');
+
+            currentResults = results;
+
+            if (results.length === 0) {
+                hasilDiv.classList.add('show');
+                actionButtons.style.display = 'none';
+                sub.textContent = t('result_sub_prefix');
+                container.innerHTML = `
+                    <div class="no-match">
+                        <i class="fas fa-seedling"></i>
+                        <h3>${t('result_no_match_title')}</h3>
+                        <p>${t('result_no_match_desc')}</p>
+                        <p style="margin-top:8px;font-size:13px;color:#8aaa8a;"><i class="fas fa-lightbulb"></i> ${t('result_no_match_tip')}</p>
+                        ${!isDataPersistent() ? `<p style="margin-top:12px;font-size:13px;color:#b86b1f;"><i class="fas fa-info-circle"></i> ${t('no_save_guest')}</p>` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            hasilDiv.classList.add('show');
+            actionButtons.style.display = 'flex';
+            const commodityLabel = getCommodityLabel(commodity);
+            sub.textContent = t('result_found_prefix', { count: results.length, commodity: commodityLabel });
+
+            let html = '';
+            for (const r of results) {
+                const badgeClass = getTypeBadge(r.type);
+                const diseaseName = getLocalizedEntry(r, 'disease') || r.disease;
+                const description = getLocalizedEntry(r, 'description') || r.description;
+                const treatment = getLocalizedEntry(r, 'treatment') || r.treatment;
+                const consequence = getLocalizedEntry(r, 'consequence') || r.consequence;
+                const typeLabel = getTypeLabel(r.type);
+                const sumberText = r.sumber || '';
+                html += `
+                    <div class="hasil-item">
+                        <div class="nama-penyakit">
+                            <span><i class="fas fa-bug"></i> ${diseaseName}</span>
+                            <span class="skor"><i class="fas fa-percent"></i> ${r.score}%</span>
+                            <span class="label-badge ${badgeClass}">${typeLabel}</span>
+                        </div>
+                        <div class="detail">
+                            <strong>${currentLang === 'en' ? 'Description:' : 'Deskripsi:'}</strong> ${description}
+                        </div>
+                        <div class="detail">
+                            <strong><i class="fas fa-hand-holding-heart"></i> ${currentLang === 'en' ? 'Treatment:' : 'Penanganan:'}</strong> ${treatment}
+                        </div>
+                        <div class="konsekuensi">
+                            <i class="fas fa-exclamation-triangle"></i> <strong>${currentLang === 'en' ? 'If not treated:' : 'Jika tidak ditangani:'}</strong> ${consequence}
+                        </div>
+                        ${r.matchedSymptoms.length > 0 ? `<div class="detail" style="font-size:13px;color:#5f7d6f;"><i class="fas fa-check-circle" style="color:#2a6b52;"></i> ${currentLang === 'en' ? 'Matching symptoms:' : 'Gejala yang cocok:'} ${r.matchedSymptoms.join(', ')}</div>` : ''}
+                        ${sumberText ? `<div class="sumber"><i class="fas fa-book-open"></i> ${t('sumber')}: ${sumberText}</div>` : ''}
+                    </div>
+                `;
+            }
+            if (!isDataPersistent()) {
+                html += `
+                    <div style="margin-top:12px;padding:12px 16px;background:#fff3e0;border-radius:12px;border-left:4px solid #f6b83d;font-size:14px;color:#8a6d3b;">
+                        <i class="fas fa-info-circle"></i> ${t('no_save_guest')}
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        // SHARE, PRINT, COPY
+        function getResultText() {
+            if (currentResults.length === 0) return currentLang === 'en' ? 'No diagnosis result.' : 'Tidak ada hasil diagnosa.';
+            const commodity = document.getElementById('commoditySelect').value;
+            const symptomText = document.getElementById('symptomInput').value.trim();
+            let text = t('share_shared_text', { commodity: getCommodityLabel(commodity), symptoms: symptomText });
+            for (const r of currentResults) {
+                const diseaseName = getLocalizedEntry(r, 'disease') || r.disease;
+                const description = getLocalizedEntry(r, 'description') || r.description;
+                const treatment = getLocalizedEntry(r, 'treatment') || r.treatment;
+                const consequence = getLocalizedEntry(r, 'consequence') || r.consequence;
+                text += t('share_entry', {
+                    disease: diseaseName,
+                    score: r.score,
+                    description: description,
+                    treatment: treatment,
+                    consequence: consequence
+                });
+            }
+            text += t('share_date', { date: formatDateReadable(new Date()) });
+            return text;
+        }
+
+        function shareResult() {
+            const text = getResultText();
+            if (navigator.share) {
+                navigator.share({
+                    title: currentLang === 'en' ? 'Plant Diagnosis Result' : 'Hasil Diagnosa Tanaman',
+                    text: text,
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert(t('share_fallback'));
+                }).catch(() => {
+                    alert(text);
+                });
+            }
+        }
+
+        function printResult() { window.print(); }
+
+        function copyResult() {
+            const text = getResultText();
+            navigator.clipboard.writeText(text).then(() => {
+                alert(t('copy_success'));
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert(t('copy_success'));
+            });
+        }
+
+        // KALENDER & PENGINGAT
+        function renderCalendar(year, month) {
+            const grid = document.getElementById('calendarGrid');
+            const monthYear = document.getElementById('calMonthYear');
+            const months = currentLang === 'en' ?
+                ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November',
+                    'December'
+                ] :
+                ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November',
+                    'Desember'
+                ];
+            monthYear.textContent = `${months[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            const today = getToday();
+            const dayNamesLocal = currentLang === 'en' ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['Min', 'Sen',
+                'Sel', 'Rab', 'Kam', 'Jum', 'Sab'
+            ];
+
+            let html = '';
+            for (const dn of dayNamesLocal) html += `<div class="day-name">${dn}</div>`;
+
+            const startOffset = firstDay;
+            for (let i = startOffset - 1; i >= 0; i--) {
+                const d = daysInPrevMonth - i;
+                html += `<div class="day-cell other-month"><span class="day-number">${d}</span></div>`;
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateObj = new Date(year, month, d);
+                const dateStr = formatDate(dateObj);
+                const isToday = dateStr === today;
+                const hasDiagnosa = riwayat.some(r => r.date === dateStr);
+                let classes = 'day-cell';
+                if (isToday) classes += ' today';
+                if (hasDiagnosa) classes += ' has-diagnosa';
+                if (selectedDate === dateStr) classes += ' has-diagnosa';
+                html += `
+                    <div class="${classes}" data-date="${dateStr}">
+                        <span class="day-number">${d}</span>
+                        ${hasDiagnosa ? '<span class="day-dot">●</span>' : ''}
+                    </div>
+                `;
+            }
+
+            const totalCells = startOffset + daysInMonth;
+            const remaining = (7 - (totalCells % 7)) % 7;
+            for (let d = 1; d <= remaining; d++) {
+                html += `<div class="day-cell other-month"><span class="day-number">${d}</span></div>`;
+            }
+
+            grid.innerHTML = html;
+
+            document.querySelectorAll('.day-cell:not(.other-month)').forEach(el => {
+                el.addEventListener('click', function() {
+                    selectedDate = this.dataset.date;
+                    renderCalendar(year, month);
+                    renderCalendarDetail(selectedDate);
+                });
+            });
+
+            if (selectedDate) {
+                const selEl = document.querySelector(`.day-cell[data-date="${selectedDate}"]`);
+                if (selEl) { selEl.style.borderColor = '#f6b83d';
+                    selEl.style.borderWidth = '3px'; }
+            }
+
+            if (!selectedDate) {
+                const todayStr = getToday();
+                const hasToday = riwayat.some(r => r.date === todayStr);
+                if (hasToday) renderCalendarDetail(todayStr);
+                else document.getElementById('calendarDetail').innerHTML =
+                    `<div class="empty"><i class="fas fa-calendar-day"></i> ${t('calendar_detail_empty')}</div>`;
+            } else {
+                renderCalendarDetail(selectedDate);
+            }
+        }
+
+        function renderCalendarDetail(dateStr) {
+            const container = document.getElementById('calendarDetail');
+            const entries = riwayat.filter(r => r.date === dateStr);
+            if (entries.length === 0) {
+                const dateObj = new Date(dateStr + 'T00:00:00');
+                const dateReadable = formatDateReadable(dateObj);
+                container.innerHTML =
+                    `<div class="empty"><i class="fas fa-calendar-day"></i> ${t('calendar_detail_no_diagnosa', {date: dateReadable})}</div>`;
+                return;
+            }
+            const dateObj = new Date(dateStr + 'T00:00:00');
+            const dateReadable = formatDateReadable(dateObj);
+            let html =
+                `<div style="font-weight:600;margin-bottom:10px;color:#1e4a3b;"><i class="fas fa-history"></i> ${t('calendar_detail_title', {date: dateReadable})}</div>`;
+            for (const e of entries) {
+                const badgeClass = getTypeBadge(e.type);
+                const entryFromKB = KNOWLEDGE_BASE.find(k => k.disease === e.disease && k.commodity === e.commodity);
+                let diseaseName = e.disease;
+                if (entryFromKB) diseaseName = getLocalizedEntry(entryFromKB, 'disease') || e.disease;
+                html += `
+                    <div class="detail-item" data-id="${e.id}">
+                        <div>
+                            <span class="disease-name"><i class="fas fa-bug"></i> ${diseaseName}</span>
+                            <span class="comm-name">${e.commodityLabel || getCommodityLabel(e.commodity)}</span>
+                            <span class="label-badge ${badgeClass}" style="font-size:11px;margin-left:6px;">${getTypeLabel(e.type)}</span>
+                        </div>
+                        ${isDataPersistent() ? `<div><button class="del-btn" data-id="${e.id}" title="${currentLang === 'en' ? 'Delete' : 'Hapus'}"><i class="fas fa-trash-alt"></i></button></div>` : ''}
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            container.querySelectorAll('.del-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (confirm(t('confirm_delete'))) {
+                        riwayat = riwayat.filter(r => r.id !== id);
+                        saveData();
+                        renderCalendar(calYear, calMonth);
+                        renderPengingat();
+                    }
+                });
+            });
+        }
+
+        function renderPengingat() {
+            const container = document.getElementById('reminderContainer');
+            const active = pengingat.filter(p => !p.done);
+            if (active.length === 0) {
+                container.innerHTML =
+                    `
+                    <div class="reminder-empty">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>${t('reminder_empty_title')}</h3>
+                        <p>${t('reminder_empty_desc')}</p>
+                        ${!isDataPersistent() ? `<p style="margin-top:8px;font-size:13px;color:#b86b1f;"><i class="fas fa-info-circle"></i> ${t('no_save_guest')}</p>` : ''}
+                    </div>
+                `;
+                return;
+            }
+            let html =
+                `<div style="margin-bottom:12px;font-weight:600;color:#1e4a3b;"><i class="fas fa-bell"></i> ${t('reminder_active_prefix', {count: active.length})}</div><div class="reminder-list">`;
+            for (const p of active) {
+                const dateObj = new Date(p.date + 'T00:00:00');
+                const dateReadable = formatDateReadable(dateObj);
+                const entryFromKB = KNOWLEDGE_BASE.find(k => k.disease === p.disease && k.commodity === p.commodity);
+                let diseaseName = p.disease;
+                let consequence = p.consequence || '';
+                if (entryFromKB) {
+                    diseaseName = getLocalizedEntry(entryFromKB, 'disease') || p.disease;
+                    consequence = getLocalizedEntry(entryFromKB, 'consequence') || p.consequence || '';
+                }
+                html += `
+                    <div class="reminder-card">
+                        <div class="reminder-info">
+                            <div class="r-title"><i class="fas fa-exclamation-triangle" style="color:#e89c2e;"></i> ${diseaseName}</div>
+                            <div class="r-desc">${getCommodityLabel(p.commodity)} · ${t('reminder_on_date', {date: dateReadable})}</div>
+                            ${consequence ? `<div class="r-conseq"><i class="fas fa-clock"></i> ${t('if_not_treated', {consequence: consequence})}</div>` : ''}
+                        </div>
+                        ${isDataPersistent() ? `
+                        <div class="reminder-actions">
+                            <button class="btn-done" data-id="${p.id}"><i class="fas fa-check"></i> ${t('reminder_btn_done')}</button>
+                            <button class="btn-dismiss" data-id="${p.id}"><i class="fas fa-times"></i> ${t('reminder_btn_dismiss')}</button>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            html += '</div>';
+            container.innerHTML = html;
+            container.querySelectorAll('.btn-done').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const item = pengingat.find(p => p.id === id);
+                    if (item) { item.done = true;
+                        saveData();
+                        renderPengingat(); }
+                });
+            });
+            container.querySelectorAll('.btn-dismiss').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (confirm(t('confirm_dismiss'))) {
+                        pengingat = pengingat.filter(p => p.id !== id);
+                        saveData();
+                        renderPengingat();
+                    }
+                });
+            });
+        }
+
+        // LOGIN/LOGOUT
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function doLogin(email) {
+            currentUser = email.trim();
+            isGuest = false;
+            loadData();
+            updateUIForUser();
+            renderAll();
+            document.getElementById('loginOverlay').classList.remove('show');
+            document.getElementById('app').style.display = 'flex';
+            alert(t('login_success', { email: currentUser }));
+            updateSaveStatus();
+        }
+
+        function doGuestMode() {
+            currentUser = null;
+            isGuest = true;
+            riwayat = [];
+            pengingat = [];
+            loadData();
+            updateUIForUser();
+            renderAll();
+            document.getElementById('loginOverlay').classList.remove('show');
+            document.getElementById('app').style.display = 'flex';
+            updateSaveStatus();
+        }
+
+        function doLogout() {
+            if (!confirm(t('confirm_logout'))) return;
+            currentUser = null;
+            isGuest = true;
+            riwayat = [];
+            pengingat = [];
+            loadData();
+            updateUIForUser();
+            renderAll();
+            document.getElementById('loginOverlay').classList.add('show');
+            document.getElementById('app').style.display = 'none';
+        }
+
+        // ===== FUNGSI BARU: KEMBALI KE HALAMAN AWAL (SPLASH SCREEN) =====
+        function goBackToSplash() {
+            if (!confirm(t('confirm_back_to_start'))) return;
+            
+            // Reset semua state
+            currentUser = null;
+            isGuest = true;
+            riwayat = [];
+            pengingat = [];
+            currentResults = [];
+            selectedDate = null;
+            
+            // Sembunyikan app dan login overlay
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('loginOverlay').classList.remove('show');
+            
+            // Tampilkan splash screen dengan animasi
+            const splash = document.getElementById('splashScreen');
+            splash.classList.remove('fade-out');
+            splash.classList.remove('hidden');
+            splash.style.display = 'flex';
+            splash.style.opacity = '1';
+            splash.style.visibility = 'visible';
+            
+            // Reset inputan
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('symptomInput').value = '';
+            document.getElementById('commoditySelect').value = '';
+            document.getElementById('hasilDiagnosa').classList.remove('show');
+            document.getElementById('hasilContainer').innerHTML = '';
+            document.getElementById('actionButtons').style.display = 'none';
+            
+            // Reset kalender ke bulan sekarang
+            const now = new Date();
+            calYear = now.getFullYear();
+            calMonth = now.getMonth();
+            
+            // Update UI
+            updateUIForUser();
+            renderAll();
+            updateSaveStatus();
+            
+            console.log('🏠 Kembali ke halaman awal');
+        }
+
+        function updateUIForUser() {
+            const userInfo = document.getElementById('userInfo');
+            const displayUsername = document.getElementById('displayUsername');
+            const userBadge = document.getElementById('userBadge');
+            const loginHeader = document.getElementById('btnLoginHeader');
+
+            if (!isGuest && currentUser) {
+                userInfo.style.display = 'flex';
+                displayUsername.textContent = currentUser;
+                userBadge.style.display = 'none';
+                loginHeader.style.display = 'none';
+            } else {
+                userInfo.style.display = 'flex';
+                displayUsername.textContent = 'Tamu';
+                userBadge.style.display = 'inline-block';
+                userBadge.textContent = '👤 Tamu';
+                loginHeader.style.display = 'inline-block';
+            }
+        }
+
+        function renderAll() {
+            renderCalendar(calYear, calMonth);
+            renderPengingat();
+            document.getElementById('hasilDiagnosa').classList.remove('show');
+            document.getElementById('hasilContainer').innerHTML = '';
+            document.getElementById('actionButtons').style.display = 'none';
+            updateSaveStatus();
+        }
+
+        // ================================================================
+        //  EVENT LISTENERS
+        // ================================================================
+        // Diagnosa
+        document.getElementById('btnDiagnosa').addEventListener('click', function() {
+            const commodity = document.getElementById('commoditySelect').value;
+            const symptomText = document.getElementById('symptomInput').value.trim();
+            if (!commodity) { alert(t('alert_no_commodity')); return; }
+            if (!symptomText) { alert(t('alert_no_symptom')); return; }
+            const results = diagnose(commodity, symptomText);
+            renderHasilDiagnosa(results, commodity, symptomText);
+
+            if (results.length > 0 && !isGuest && currentUser) {
+                const today = getToday();
+                for (const r of results.slice(0, 3)) {
+                    const exists = riwayat.some(ri => ri.date === today && ri.disease === r.disease && ri.commodity === r
+                        .commodity);
+                    if (!exists) {
+                        riwayat.push({
+                            id: 'h_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                            date: today,
+                            commodity: r.commodity,
+                            commodityLabel: getCommodityLabel(r.commodity),
+                            disease: r.disease,
+                            type: r.type,
+                            symptoms: r.symptoms,
+                            treatment: r.treatment,
+                            consequence: r.consequence,
+                            description: r.description,
+                            score: r.score
+                        });
+                        const remindExists = pengingat.some(p => p.date === today && p.disease === r.disease && p
+                            .commodity === r.commodity && !p.done);
+                        if (!remindExists) {
+                            pengingat.push({
+                                id: 'r_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                                date: today,
+                                commodity: r.commodity,
+                                disease: r.disease,
+                                consequence: r.consequence,
+                                done: false,
+                            });
+                        }
+                    }
+                }
+                saveData();
+                renderCalendar(calYear, calMonth);
+                renderPengingat();
+                updateSaveStatus();
+            } else if (results.length > 0 && isGuest) {
+                updateSaveStatus();
+            }
+        });
+
+        // Tombol aksi hasil
+        document.getElementById('btnShareResult').addEventListener('click', shareResult);
+        document.getElementById('btnPrintResult').addEventListener('click', printResult);
+        document.getElementById('btnCopyResult').addEventListener('click', copyResult);
+
+        // Cetak kalender
+        document.getElementById('btnPrintCalendar').addEventListener('click', () => window.print());
+
+        // Navigasi tab
+        document.querySelectorAll('.nav-tabs button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+                if (tabId === 'tabKalender') renderCalendar(calYear, calMonth);
+                else if (tabId === 'tabPengingat') renderPengingat();
+            });
+        });
+
+        // Tombol kembali dari Kalender ke Diagnosa
+        document.getElementById('btnBackFromCalendar').addEventListener('click', function() {
+            document.querySelector('.nav-tabs button[data-tab="tabDiagnosa"]').click();
+        });
+
+        // Tombol kembali dari Pengingat ke Diagnosa
+        document.getElementById('btnBackFromReminder').addEventListener('click', function() {
+            document.querySelector('.nav-tabs button[data-tab="tabDiagnosa"]').click();
+        });
+
+        // ===== TOMBOL KEMBALI KE HALAMAN AWAL =====
+        document.getElementById('btnBackToSplash').addEventListener('click', goBackToSplash);
+
+        // Tombol keluar aplikasi
+        document.getElementById('btnExitApp').addEventListener('click', function() {
+            if (confirm(t('confirm_exit'))) {
+                const exitMsg = document.createElement('div');
+                exitMsg.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#1e4a3b;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;color:#fff;font-family:Segoe UI,sans-serif;';
+                exitMsg.innerHTML = `
+                    <div style="text-align:center;padding:20px;">
+                        <i class="fas fa-seedling" style="font-size:80px;color:#f6b83d;margin-bottom:20px;"></i>
+                        <h1 style="font-size:32px;margin-bottom:10px;">Terima Kasih</h1>
+                        <p style="font-size:18px;opacity:0.9;">SiDiagnosa telah ditutup. Sampai jumpa!</p>
+                        <p style="font-size:14px;opacity:0.6;margin-top:20px;">Anda dapat menutup tab ini atau refresh untuk memulai ulang.</p>
+                    </div>
+                `;
+                document.body.appendChild(exitMsg);
+                document.getElementById('app').style.display = 'none';
+                document.getElementById('loginOverlay').classList.remove('show');
+            }
+        });
+
+        // Navigasi kalender
+        document.getElementById('calPrev').addEventListener('click', function() {
+            calMonth--;
+            if (calMonth < 0) { calMonth = 11;
+                calYear--; }
+            renderCalendar(calYear, calMonth);
+        });
+        document.getElementById('calNext').addEventListener('click', function() {
+            calMonth++;
+            if (calMonth > 11) { calMonth = 0;
+                calYear++; }
+            renderCalendar(calYear, calMonth);
+        });
+
+        // Login
+        document.getElementById('btnLogin').addEventListener('click', function() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const error = document.getElementById('loginError');
+
+            if (!email) {
+                error.textContent = t('login_error_blank');
+                error.classList.add('show');
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                error.textContent = t('login_error_invalid');
+                error.classList.add('show');
+                return;
+            }
+
+            error.classList.remove('show');
+            doLogin(email);
+        });
+
+        document.getElementById('loginEmail').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnLogin').click();
+            }
+        });
+
+        document.getElementById('btnGuest').addEventListener('click', function() {
+            document.getElementById('loginError').classList.remove('show');
+            doGuestMode();
+        });
+
+        document.getElementById('btnLoginHeader').addEventListener('click', function() {
+            document.getElementById('loginOverlay').classList.add('show');
+        });
+
+        document.getElementById('btnLogout').addEventListener('click', function() {
+            if (confirm(t('confirm_logout'))) doLogout();
+        });
+
+        // Splash
+        document.getElementById('btnStartSplash').addEventListener('click', function() {
+            const splash = document.getElementById('splashScreen');
+            splash.classList.add('fade-out');
+            setTimeout(() => {
+                splash.style.display = 'none';
+                document.getElementById('loginOverlay').classList.add('show');
+                document.getElementById('app').style.display = 'none';
+                const now = new Date();
+                document.getElementById('currentDateDisplay').textContent = formatDateReadable(now);
+                currentUser = null;
+                isGuest = true;
+                riwayat = [];
+                pengingat = [];
+                loadData();
+                updateUIForUser();
+                renderAll();
+                applyTranslations();
+                updateSaveStatus();
+            }, 700);
+        });
+
+        // Bahasa
+        document.getElementById('langToggle').addEventListener('click', function() {
+            setLanguage(currentLang === 'id' ? 'en' : 'id');
+        });
+
+        // Shortcut
+        document.getElementById('symptomInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) document.getElementById('btnDiagnosa').click();
+        });
+
+        // INIT
+        document.getElementById('langToggleLabel').textContent = currentLang.toUpperCase();
+        applyTranslations();
+        console.log('🌱 SiDiagnosa siap digunakan!');
+        console.log(`📚 ${KNOWLEDGE_BASE.length} data pengetahuan dimuat.`);
+        console.log(`🌐 Bahasa aktif: ${currentLang}`);
+        console.log('🏠 Tombol "Kembali ke Awal" akan membawa Anda ke halaman splash screen.');
+        console.log('🔐 Login dengan email untuk menyimpan data secara permanen.');
+        console.log('👤 Mode Tamu: Data tidak akan tersimpan.');
+    </script>
+</body>
+</html>
